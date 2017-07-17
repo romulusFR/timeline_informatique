@@ -1,9 +1,9 @@
-build: all single 
-  #all single
+build: one_card nine_cards
 
-single: card_single.tex
-	rubber -v --warn all --force --pdf card_single.tex
 
-all: cards_all.tex
-	rubber -v --warn all --force --pdf cards_all.tex
+one_card: test_one_card_by_page.tex
+	rubber -v --warn all --force --pdf test_one_card_by_page.tex
+
+nine_cards: test_nine_cards_by_page.tex
+	rubber -v --warn all --force --pdf test_nine_cards_by_page.tex
 
