@@ -1,4 +1,5 @@
-build: test_one_card test_nine_cards one_card nine_cards
+build: one_card nine_cards
+#test_one_card test_nine_cards 
 
 
 one_card: test_one_card_by_page.tex
