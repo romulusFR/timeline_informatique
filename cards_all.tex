@@ -1,0 +1,38 @@
+\documentclass[a4paper]{article} %landscape
+
+
+\input{./packages}
+\input{./tikzcards}
+
+\begin{document}
+% \input{./cards/1_bug_front.tex}
+% \input{./cards/1_bug_back.tex}
+%\clearpage
+\begin{center}
+  \begin{tabular}{ccc}
+  \input{./cards/1_bug_front.tex} &
+  \input{./cards/2_3laws_front.tex} &
+  \input{./cards/3_c3po_front.tex} \\
+  \input{./cards/1_bug_front.tex} &
+  \input{./cards/2_3laws_front.tex} &
+  \input{./cards/3_c3po_front.tex} \\
+  \input{./cards/1_bug_front.tex} &
+  \input{./cards/2_3laws_front.tex} &
+  \input{./cards/3_c3po_front.tex} \\
+  \end{tabular}
+\end{center}
+\begin{center}
+  \begin{tabular}{ccc}
+  \input{./cards/3_c3po_back.tex} &
+  \input{./cards/2_3laws_back.tex} &
+  \input{./cards/1_bug_back.tex} \\
+  \input{./cards/3_c3po_back.tex} &
+  \input{./cards/2_3laws_back.tex} &
+  \input{./cards/1_bug_back.tex} \\
+  \input{./cards/3_c3po_back.tex} &
+  \input{./cards/2_3laws_back.tex} &
+  \input{./cards/1_bug_back.tex} \\
+  \end{tabular}
+\end{center}
+
+\end{document}

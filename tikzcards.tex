@@ -1,0 +1,143 @@
+\pgfmathsetmacro{\cardwidth}{6.35}%{6.35}%{5.715} %
+%% width of card in cm. 5.715 = 2.25 in, 6.35 = 2.5 in
+\pgfmathsetmacro{\cardheight}{8.875}
+%% height of a card in cm. 8.875 = 3.5 in
+
+\pgfmathsetmacro{\borderwidth}{0.3}%{0.0167*\cardwidth}%{0.1}
+%% white border around the card
+
+\pgfmathsetmacro{\imagewidth}{1*\cardwidth-2*\borderwidth}
+\pgfmathsetmacro{\imageheight}{1*\cardheight-2*\borderwidth}
+%% the image is AUTOMATICALLY RESIZED to fit the \imagewidth * \imageheight zone
+
+\pgfmathsetmacro{\stripwidth}{0.100*\cardwidth}%{0.7} % 0.12
+%% strip is background for indices and title
+\pgfmathsetmacro{\strippadding}{0.0333*\cardwidth}%{0.2}
+%% padding around strips
+\pgfmathsetmacro{\textpadding}{0.0167*\cardwidth}%{0.1}
+%% padding for text
+
+\pgfmathsetmacro{\ratiocontent}{0.66}
+%% % of vertical space used for content
+
+\def\shapeCard{(0,0) rectangle (\cardwidth,\cardheight)}
+%% main card (with rounded corners)
+\def\shapeBackground{(\borderwidth,\borderwidth) rectangle (\cardwidth-\borderwidth,\cardheight-\borderwidth)}
+%% main rectangle of cards, where the image is printed
+
+\pgfmathsetmacro{\titley}{\strippadding+1*\stripwidth+\borderwidth}
+%% vertical position of title : center of area
+\pgfmathsetmacro{\titlex}{\stripwidth + 2*\strippadding + \borderwidth + \textpadding + 0.5*(\cardwidth-\stripwidth-3*\strippadding-2*\borderwidth-2*\textpadding)}
+%% vertical position of title : center of area
+
+\def\shapeTitle{(2*\strippadding+\stripwidth+\borderwidth,\strippadding+\borderwidth) rectangle (\cardwidth-\strippadding-\borderwidth,2*\stripwidth+\strippadding+\borderwidth)}
+%% backgound zone for title
+
+%% title (front)/date (back) : upper left to  lower right
+\def\shapeContentArea{(2*\strippadding+\stripwidth+\borderwidth,\cardheight) rectangle (\cardwidth,\cardheight-\borderwidth-\ratiocontent*\cardheight)}
+%% main text (back of the card), relative to cardheight and cardwidth to "cut" top and right rounded corners
+
+\def\shapeStrip{(\strippadding+\borderwidth,\cardheight) rectangle (\strippadding+\stripwidth+\borderwidth,\strippadding+\borderwidth)}
+%% vertical left long text
+
+%% tickzset styles
+\tikzset{
+  cardcorners/.style={
+    inner sep=0,
+    outer sep=0,
+    rounded corners=\strippadding *1cm %
+    %% rounded corners of cards
+  },
+  elementcorners/.style={
+    rounded corners= \textpadding *1cm % 0.1cm
+    %% rounded corners of strips in the card
+  },
+  stripshadow/.style={
+    drop shadow={
+        opacity=.2,
+        color=black
+    }
+    %% shadow for strips
+  },
+  strip/.style={
+    elementcorners,
+    stripshadow
+    %% main style for strips
+  },
+  cardimage/.style={
+    path picture={
+      \node at (0.5*\cardwidth,0.5*\cardheight) {
+          \includegraphics[height=\imageheight cm, width=\imagewidth cm]{#1}
+      };
+    }
+    %% main picture
+  },
+}
+
+\newcommand{\carddebug}{
+  \draw [step=0.25in,help lines] (0,0) grid (\cardwidth,\cardheight);
+}
+%% debug
+
+\newcommand{\cardborder}{
+  \draw[lightgray, cardcorners]  \shapeCard; %[lightgray, cardcorners] 
+}
+%% main card, with border
+
+\newcommand{\cardbackground}[1]{
+  \fill[cardimage=#1] \shapeBackground;
+}
+%% main zone, where the image is printed
+
+
+%% Left strip of the card, with bg color (arg #1) and text (arg #2) written vertically
+\newcommand{\cardtype}[2]{
+  % The \clip command does not allow options, therefore  we have to use a scope to set the even odd rule.
+  \begin{scope}[even odd rule]
+    % Define a clipping path. All paths outside shapeCard will be cut because the even odd rule is set.
+    \clip[cardcorners] \shapeBackground;
+    % Since the even odd rule is set, only the card will be filled.
+    \fill[strip,#1] \shapeStrip (\strippadding+0.5*\stripwidth+\borderwidth,\cardheight-\borderwidth-\textpadding) node[rotate=90, left] {
+      \color{white}\uppercase{#2}%
+    };
+  \end{scope}
+}
+
+%% Title (arg #1) of the card, written on shapeTitle
+\newcommand{\cardtitle}[1]{
+  \fill[elementcorners,titlebg,opacity=.85] \shapeTitle;
+  \node[align=center, text width=(\cardwidth-\stripwidth-2*\strippadding-2*\borderwidth-2*\textpadding)*1cm,font=\large] at (\titlex,\titley) {%
+    \color{white}\uppercase{#1}%
+  };
+}
+
+%% Maincontent, written at the back: date (arg #1) and description (arg #2)
+\newcommand{\cardcontent}[2]{
+  \begin{scope}[even odd rule]
+    \clip \shapeBackground;
+    \fill[elementcorners,contentbg,opacity=.85] \shapeContentArea;
+  \end{scope}
+  \node[below right, align=justify, text width=(\cardwidth-2*\strippadding-\stripwidth-4*\textpadding-2*\borderwidth)*1cm] at (2*\strippadding+\stripwidth+\textpadding+\borderwidth,\cardheight-\strippadding-\borderwidth) {
+    \centerline{\bf\large #1}\\%
+    {\footnotesize #2}
+  };
+}
+
+%% Print vertical credits (arg #2) on a side (front). Text color (arg #1) is white by default
+%% -0.105 shift so that the text is aligned along the border
+\newcommand{\cardcredits}[2][white]{
+  \node[rotate=90, left] at (\cardwidth-\borderwidth-0.105,\cardheight-\borderwidth) {
+    {\color{#1}\tiny #2}
+  };
+}
+
+%% given card types, shorthand
+\newcommand{\cardtypePop}{\cardtype{popbg}{{Culture populaire}}}
+\newcommand{\cardtypeHard}{\cardtype{hardbg}{{Matériel}}}
+\newcommand{\cardtypeSoft}{\cardtype{softbg}{{Logiciel}}}
+\newcommand{\cardtypeLang}{\cardtype{langbg}{{Langages de programmation}}}
+\newcommand{\cardtypeTheory}{\cardtype{theorybg}{{Fondements et concepts}}}
+\newcommand{\cardtypeGame}{\cardtype{gamebg}{{Jeux vidéos}}}
+\newcommand{\cardtypeWeb}{\cardtype{webbg}{{Réseaux et web}}}
+\newcommand{\cardtypeMan}{\cardtype{manbg}{{Personnalité}}}
+
