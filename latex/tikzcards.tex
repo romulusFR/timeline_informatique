@@ -113,7 +113,7 @@
 %% Title (arg #1) of the card, written on shapeTitle
 \newcommand{\cardtitle}[1]{
   \fill[elementcorners,titlebg,opacity=.85] \shapeTitle;
-  \node[align=center, text width=(\cardwidth-\stripwidth-2*\strippadding-2*\borderwidth-2*\textpadding)*1cm,font=\large] at (\titlex,\titley) {%
+  \node[align=center, text width=(\cardwidth-\stripwidth-2*\strippadding-2*\borderwidth-2*\textpadding)*1cm] at (\titlex,\titley) {%
     \color{white}\uppercase{#1}%
   };
 }
@@ -125,7 +125,7 @@
     \fill[elementcorners,contentbg,opacity=.85] \shapeContentArea;
   \end{scope}
   \node[below right, align=justify, text width=(\imagewidth-2*\strippadding-\stripwidth-2*\textpadding)*1cm] at (2*\strippadding+\stripwidth+\borderwidth,\cardheight-\strippadding-\borderwidth) {
-    \centerline{\bf\large #1}\\%
+    \centerline{\bf\Large #1}\\%
     {\footnotesize #2}
   };
 }
