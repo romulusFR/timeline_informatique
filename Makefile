@@ -1,4 +1,5 @@
-build: single
+build: all single 
+  #all single
 
 single: card_single.tex
 	rubber -v --warn all --force --pdf card_single.tex

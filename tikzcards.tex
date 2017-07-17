@@ -9,6 +9,11 @@
 \pgfmathsetmacro{\imagewidth}{1*\cardwidth-2*\borderwidth}
 \pgfmathsetmacro{\imageheight}{1*\cardheight-2*\borderwidth}
 %% the image is AUTOMATICALLY RESIZED to fit the \imagewidth * \imageheight zone
+%% ratio for poker-sized deck:
+%%  w: 63.5-2*3 = 57.5
+%%  h: 88.9-2*3 = 82.9
+%%  w/h = 0.6936
+%%  h/w = 1.4417 (~13/9, ie 3R photo format)
 
 \pgfmathsetmacro{\stripwidth}{0.100*\cardwidth}%{0.7} % 0.12
 %% strip is background for indices and title
@@ -61,7 +66,7 @@
   },
   strip/.style={
     elementcorners,
-    stripshadow
+    %% stripshadow
     %% main style for strips
   },
   cardimage/.style={
@@ -85,7 +90,7 @@
 %% main card, with border
 
 \newcommand{\cardbackground}[1]{
-  \fill[cardimage=#1] \shapeBackground;
+  \draw[lightgray,cardimage=#1] \shapeBackground;
 }
 %% main zone, where the image is printed
 
@@ -117,7 +122,7 @@
     \clip \shapeBackground;
     \fill[elementcorners,contentbg,opacity=.85] \shapeContentArea;
   \end{scope}
-  \node[below right, align=justify, text width=(\cardwidth-2*\strippadding-\stripwidth-4*\textpadding-2*\borderwidth)*1cm] at (2*\strippadding+\stripwidth+\textpadding+\borderwidth,\cardheight-\strippadding-\borderwidth) {
+  \node[below right, align=justify, text width=(\imagewidth-2*\strippadding-\stripwidth-2*\textpadding)*1cm] at (2*\strippadding+\stripwidth+\borderwidth,\cardheight-\strippadding-\borderwidth) {
     \centerline{\bf\large #1}\\%
     {\footnotesize #2}
   };
