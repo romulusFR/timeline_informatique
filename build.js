@@ -25,7 +25,9 @@ if (!fs.existsSync(latex_path)){
 
 //sys call to imagemagick
 function convert(input, output, y, x, dy, dx){
-  exec(`convert ${input} -quality 100 -crop "${y}x${x}+${dy}+${dx}" -resize "${golden_height}x${golden_width}" ${output}`, (err, stdout, stderr) => {
+  let cmd = `convert ${input} -quality 98 -crop "${y}x${x}+${dy}+${dx}" -resize "${golden_width}x${golden_height}" ${output}`;
+  console.log('exec: ' + cmd);
+  exec(cmd, (err, stdout, stderr) => {
     if (err) {
       return;
     }
@@ -124,8 +126,11 @@ function back_content(card_obj){
 //id,type,title,year,picture,credits,description
 
 function download_and_generate_contents(card_obj){
-  download(card_obj.picture, pict_filename(card_obj, '_web_original'), () => {console.log(pict_filename(card_obj)); resizer(pict_filename(card_obj, '_web_original'), pict_filename(card_obj));});
-  //resize image to fit the size of a card
+  download(card_obj.picture, pict_filename(card_obj, '_web_original'), () => {
+    console.log(pict_filename(card_obj));
+    resizer(pict_filename(card_obj, '_web_original'), pict_filename(card_obj));
+  });
+  //download and resize image to fit the size of a card
   
   fs.writeFileSync(front_filename(card_obj),front_content(card_obj) );
   fs.writeFileSync(back_filename(card_obj),back_content(card_obj) );
@@ -173,8 +178,8 @@ function generate_latex_nine_cards_by_page(){
   let header =
   `\\documentclass[a4paper]{article}
 
-  \\input{./packages}
-  \\input{./tikzcards}
+  \\input{./latex/packages}
+  \\input{./latex/tikzcards}
 
   \\geometry{hmargin=5mm, vmargin=10mm}
 
