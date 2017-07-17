@@ -2,28 +2,40 @@ let fs = require('fs');
 let parse = require('csv-parse/lib/sync');
 let request = require('request');
 let path = require('path');
-
 let im_meta = require('im-metadata');
 let {exec} = require('child_process');
 
+
+// height of images : (card_height - 2*borders) * 300dpi, here for a poker-sized deck (3.5 in)
 const golden_height = 980;
+// width of images : (card_width - 2*borders) * 300dpi, here for a poker-sized deck (2.5 in)
 const golden_width = 680;
 const golden_ratio = golden_height/golden_width;
 
-const img_path = './deck/';
-const latex_path = './deck/';
-const latex_one_card_by_page_name = './one_card_by_page.tex';
-const latex_nine_cards_by_page_name = './nine_cards_by_page.tex';
+const img_path = './deck/';                                           //where to store downloaded images 
+const latex_path = './deck/';                                         //where to store generated .tex cards 
+const latex_one_card_by_page_name = './one_card_by_page.tex';         //main .tex with paper size set to the card
+const latex_nine_cards_by_page_name = './nine_cards_by_page.tex';     //main .tex with paper size set to A4, 3x3 cards by page
+const rules_front = latex_path + '0_rules_front.tex';                 //special "rules" card, front, added to the deck
+const rules_back  = latex_path + '0_rules_back.tex';                  //special "rules" card, back, added to the deck
+const blank_card  = latex_path + '00_blank.tex';                      //special blank card, added to pad A4 paper
 
+//create dir if not existent
 if (!fs.existsSync(img_path)){
   fs.mkdirSync(img_path);
 }
-
 if (!fs.existsSync(latex_path)){
   fs.mkdirSync(latex_path);
 }
 
-//sys call to imagemagick
+// MAIN GLOBAL VARIABLES
+// synchronous read and parse
+let input = fs.readFileSync('./contents.csv');
+//format of csv is //id,type,title,year,picture,credits,description//
+let cards = parse(input, {delimiter: ',', columns : true});
+
+
+//system call to resize images using image magick's convert
 function convert(input, output, y, x, dy, dx){
   let cmd = `convert ${input} -quality 98 -crop "${y}x${x}+${dy}+${dx}" -resize "${golden_width}x${golden_height}" ${output}`;
   console.log('exec: ' + cmd);
@@ -36,19 +48,7 @@ function convert(input, output, y, x, dy, dx){
   });
 }
 
-// synchronous read and parse
-let input = fs.readFileSync('./contents.csv');
-let cards = parse(input, {delimiter: ',', columns : true});
-
-
-function download(uri, filename, callback){
-  request.head(uri, function(err, res, body){
-    // console.log('content-type:', res.headers['content-type']);
-    // console.log('content-length:', res.headers['content-length']);
-    request(uri).pipe(fs.createWriteStream(filename)).on('close', callback);
-  });
-};
-
+//resize images according to their format wrt the ideal one
 function resizer(input, output){
   im_meta(input, {}, function(error, metadata) {
     if (error) { console.error(error); }
@@ -62,7 +62,16 @@ function resizer(input, output){
   });
 };
 
+//async download an image (or smtg else)
+function download(uri, filename, callback){
+  request.head(uri, function(err, res, body){
+    // console.log('content-type:', res.headers['content-type']);
+    // console.log('content-length:', res.headers['content-length']);
+    request(uri).pipe(fs.createWriteStream(filename)).on('close', callback);
+  });
+};
 
+//to have courtesy file names
 function clean_french(string){
   let accent = [
     /[\300-\306]/g, /[\340-\346]/g, // A, a
@@ -79,25 +88,28 @@ function clean_french(string){
   }
 
   string = string.replace(/&/g, "et");
-  //On met tout en minuscule
-  //On remplace tous les espaces par des "_"
   string = string.replace(/[/\\?,.;:§!{}()\[\]']/g, "");
   string = string.replace(/[ ]+/g, "_");
   string = string.toLowerCase();
   return string;
 }
 
+
+//helpers
 function pict_filename(card_obj, suffix = ''){
   return img_path + card_obj.id + '_' + clean_french(card_obj.title) + suffix + path.extname(card_obj.picture);
 };
-
 function card_type(str){
   return '\\cardtype' + str.charAt(0).toUpperCase() + str.slice(1);
-}
-
+};
 function front_filename(card_obj){
   return latex_path + card_obj.id + '_' + clean_french(card_obj.title) + '_front.tex';
 };
+function back_filename(card_obj){
+  return latex_path + card_obj.id + '_' + clean_french(card_obj.title) + '_back.tex';
+};
+
+// main content of .tex files associated to a card. uses macros in ./latex
 function front_content(card_obj){
   return`
   \\begin{tikzpicture}
@@ -109,9 +121,6 @@ function front_content(card_obj){
   \\end{tikzpicture}`;
 }
 
-function back_filename(card_obj){
-  return latex_path + card_obj.id + '_' + clean_french(card_obj.title) + '_back.tex';
-};
 function back_content(card_obj){
   return`
   \\begin{tikzpicture}
@@ -123,7 +132,6 @@ function back_content(card_obj){
   \\end{tikzpicture}`;
 }
 
-//id,type,title,year,picture,credits,description
 
 function download_and_generate_contents(card_obj){
   download(card_obj.picture, pict_filename(card_obj, '_web_original'), () => {
@@ -131,17 +139,16 @@ function download_and_generate_contents(card_obj){
     resizer(pict_filename(card_obj, '_web_original'), pict_filename(card_obj));
   });
   //download and resize image to fit the size of a card
-  
   fs.writeFileSync(front_filename(card_obj),front_content(card_obj) );
   fs.writeFileSync(back_filename(card_obj),back_content(card_obj) );
 }
 
+//generates all .tex files
 function generate_all_contents(){
   for(let i = 0; i < cards.length; i++){
     download_and_generate_contents(cards[i]);
   }
 }
-
 
 function generate_latex_one_card_by_page(){
   let header =
@@ -158,7 +165,8 @@ function generate_latex_one_card_by_page(){
   \\begin{document}%
   `;
 
-  let document = '';
+  let document = '';  
+
   for(let i = 0; i < cards.length; i++){
     document += `
     \\clearpage%
@@ -167,6 +175,14 @@ function generate_latex_one_card_by_page(){
     \\input{${back_filename(cards[i])}}%
     `;
   }
+
+  //manually deal with the rules
+  document += `
+    \\clearpage%
+    \\input{${rules_front}}%
+    \\clearpage%
+    \\input{${rules_back}}%
+    `;
 
   let footer = 
   `\\end{document}`;
@@ -201,23 +217,59 @@ function generate_latex_nine_cards_by_page(){
   `\\end{document}`;
 
   let document = '';
-  for(let p = 0; p < cards.length/9; p++){
+
+  //key helper to pad the 3x3 tabular with cards
+  function tabular_line_or_rules(idx, front=true){
+    let str = '';
+    if(idx < cards.length){
+      //standard card from the content file
+      if(front)
+        str = `      \\input{${front_filename(cards[idx])}}`;
+      else
+        str = `      \\input{${back_filename(cards[idx])}}`;
+    }
+    else if (idx == cards.length){
+      //extra rule card appended at the end
+      if(front)
+        str = `      \\input{${rules_front}}`;
+      else
+        str = `      \\input{${rules_back}}`;
+    }
+    else{
+      //padding to fill the 3x3 tabular area
+      str = `      \\input{${blank_card}}`;
+    }
+
+    if(front){
+      if((idx)%3 == 2)
+        str += '\\\\%\r\n';
+      else
+        str += '&%\r\n';
+    }
+    else{
+      if((idx)%3 == 0)
+        str += '\\\\%\r\n';
+      else
+        str += '&%\r\n';
+    }
+    return str;
+  }
+
+  for(let p = 0; p < (cards.length+1)/9; p++){
     //for each printing plate, which is 3x3
     document += tabular_start;
     for(let l = 0; l < 3; l++){
-      //for each line
-      document += (9*p+3*l+0 < cards.length)?`      \\input{${front_filename(cards[9*p+3*l+0])}} &%\r\n`:`&%\r\n`;
-      document += (9*p+3*l+1 < cards.length)?`      \\input{${front_filename(cards[9*p+3*l+1])}} &%\r\n`:`&%\r\n`;
-      document += (9*p+3*l+2 < cards.length)?`      \\input{${front_filename(cards[9*p+3*l+2])}}\\\\%\r\n`:`\\\\%\r\n`;
+      document += tabular_line_or_rules(9*p+3*l+0, true);
+      document += tabular_line_or_rules(9*p+3*l+1, true);
+      document += tabular_line_or_rules(9*p+3*l+2, true);
     }
     document += tabular_end;
 
     document += tabular_start;
     for(let l = 0; l < 3; l++){
-      //for each line
-      document += (9*p+3*l+2 < cards.length)?`      \\input{${back_filename(cards[9*p+3*l+2])}} &%\r\n`:`&%\r\n`;
-      document += (9*p+3*l+1 < cards.length)?`      \\input{${back_filename(cards[9*p+3*l+1])}} &%\r\n`:`&%\r\n`;
-      document += (9*p+3*l+0 < cards.length)?`      \\input{${back_filename(cards[9*p+3*l+0])}}\\\\%\r\n`:`\\\\%\r\n`;
+      document += tabular_line_or_rules(9*p+3*l+2, false);
+      document += tabular_line_or_rules(9*p+3*l+1, false);
+      document += tabular_line_or_rules(9*p+3*l+0, false);
     }
     document += tabular_end;
   } 
