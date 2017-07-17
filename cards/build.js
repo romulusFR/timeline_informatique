@@ -142,8 +142,8 @@ function generate_latex_one_card_by_page(){
   let header =
   `\\documentclass[a4paper]{article}
 
-  \\input{./packages}
-  \\input{./tikzcards}
+  \\input{./latex/packages}
+  \\input{./latex/tikzcards}
 
   \\geometry{
     paperheight= 88.9mm, %see \\cardheight cm,
