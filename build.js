@@ -11,7 +11,12 @@ const golden_height = 980;
 // width of images : (card_width - 2*borders) * 300dpi, here for a poker-sized deck (2.5 in)
 const golden_width = 680;
 const golden_ratio = golden_height/golden_width;
+// percentage of "visible" width, ie, tthe width of the card minus the width of the vertical strip and (2) strip paddings
+const strip_width_percent = 0.1666;
+// ratio of the visible part of the image
+const corrected_ratio = golden_height/(golden_width*(1-strip_width_percent));
 
+const content_file = './Computer_history_timeline - Contenus.csv';
 const img_path = './deck/';                                           //where to store downloaded images 
 const latex_path = './deck/';                                         //where to store generated .tex cards 
 const latex_one_card_by_page_name = './one_card_by_page.tex';         //main .tex with paper size set to the card
@@ -30,14 +35,14 @@ if (!fs.existsSync(latex_path)){
 
 // MAIN GLOBAL VARIABLES
 // synchronous read and parse
-let input = fs.readFileSync('./contents.csv');
-//format of csv is //id,type,title,year,picture,credits,description//
+let input = fs.readFileSync(content_file);
+//format of csv is //id,type,title,year,picture,credits,description,credits_color//
 let cards = parse(input, {delimiter: ',', columns : true});
 
 
 //system call to resize images using image magick's convert
-function convert(input, output, y, x, dy, dx){
-  let cmd = `convert ${input} -quality 98 -crop "${y}x${x}+${dy}+${dx}" -resize "${golden_width}x${golden_height}" ${output}`;
+function convert(input, output, x, y, dx, dy){
+  let cmd = `convert ${input} -quality 98 -crop "${x}x${y}+${dx}+${dy}" -resize "${golden_width}x${golden_height}" ${output}`;
   console.log('exec: ' + cmd);
   exec(cmd, (err, stdout, stderr) => {
     if (err) {
@@ -51,13 +56,17 @@ function convert(input, output, y, x, dy, dx){
 //resize images according to their format wrt the ideal one
 function resizer(input, output){
   im_meta(input, {}, function(error, metadata) {
-    if (error) { console.error(error); }
+    if (error) {
+      console.error(error);
+    }
     let ratio = metadata.height / metadata.width;
+    //if the image is too much vertical
     if (ratio > golden_ratio){
       convert(input, output,  metadata.width, Math.round(metadata.width*golden_ratio), 0, Math.round((metadata.height-metadata.width*golden_ratio)/2) )
     }
+    //if the image is too much horizontal. In that case, we have enough space to shift the cropped image on the "visible" part of the image
     else{
-      convert(input, output,  Math.round(metadata.height/golden_ratio), metadata.height, Math.round((metadata.width-metadata.height/golden_ratio)/2), 0 )
+      convert(input, output,  Math.round(metadata.height/golden_ratio), metadata.height, Math.round((metadata.width-(1+strip_width_percent)*metadata.height/golden_ratio)/2), 0 )
     }
   });
 };
@@ -111,13 +120,16 @@ function back_filename(card_obj){
 
 // main content of .tex files associated to a card. uses macros in ./latex
 function front_content(card_obj){
+  if (!card_obj.credits_color)
+    card_obj.credits_color = 'white';
+
   return`
   \\begin{tikzpicture}
     \\cardborder
     \\cardbackground{${pict_filename(card_obj)}}
     ${card_type(card_obj.type)}
     \\cardtitle{${card_obj.title}}
-    \\cardcredits{${card_obj.credits}}
+    \\cardcredits[${card_obj.credits_color}]{${card_obj.credits}}
   \\end{tikzpicture}`;
 }
 
@@ -133,12 +145,14 @@ function back_content(card_obj){
 }
 
 
-function download_and_generate_contents(card_obj){
-  download(card_obj.picture, pict_filename(card_obj, '_web_original'), () => {
+function download_and_generate_contents(card_obj){ 
+  //download and resize image to fit the size of a card
+/*   download(card_obj.picture, pict_filename(card_obj, '_web_original'), () => {
     console.log(pict_filename(card_obj));
     resizer(pict_filename(card_obj, '_web_original'), pict_filename(card_obj));
-  });
-  //download and resize image to fit the size of a card
+  }); */
+  resizer(pict_filename(card_obj, '_web_original'), pict_filename(card_obj));
+  
   fs.writeFileSync(front_filename(card_obj),front_content(card_obj) );
   fs.writeFileSync(back_filename(card_obj),back_content(card_obj) );
 }
