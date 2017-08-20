@@ -16,7 +16,7 @@ const strip_width_percent = 0.1666;
 // ratio of the visible part of the image
 const corrected_ratio = golden_height/(golden_width*(1-strip_width_percent));
 
-const content_file = './Computer_history_timeline - Contenus.csv';
+const default_content_file = './Computer_history_timeline - Contenus.csv';
 const img_path = './deck/';                                           //where to store downloaded images 
 const latex_path = './deck/';                                         //where to store generated .tex cards 
 const latex_one_card_by_page_name = './one_card_by_page.tex';         //main .tex with paper size set to the card
@@ -35,6 +35,10 @@ if (!fs.existsSync(latex_path)){
 
 // MAIN GLOBAL VARIABLES
 // synchronous read and parse
+let content_file = default_content_file;
+if (process.argv[2])
+  content_file = process.argv[2];
+
 let input = fs.readFileSync(content_file);
 //format of csv is //id,type,title,year,picture,credits,description,credits_color//
 let cards = parse(input, {delimiter: ',', columns : true});
