@@ -14,8 +14,9 @@ const golden_width = 680;
 const golden_ratio = golden_height/golden_width;
 // percentage of "visible" width, ie, tthe width of the card minus the width of the vertical strip and (2) strip paddings
 const strip_width_percent = 0.1666;
+const ratio_threshold = 0.02;
 
-const default_content_file = './Computer_history_timeline - Contenus.csv';
+// const default_content_file = './Computer_history_timeline - Contenus.csv';
 const img_path = './deck/';                                           //where to store downloaded images 
 const latex_path = './deck/';                                         //where to store generated .tex cards 
 const latex_one_card_by_page_name = './one_card_by_page.tex';         //main .tex with paper size set to the card
@@ -23,6 +24,13 @@ const latex_nine_cards_by_page_name = './nine_cards_by_page.tex';     //main .te
 const rules_front = latex_path + '0_rules_front.tex';                 //special "rules" card, front, added to the deck
 const rules_back  = latex_path + '0_rules_back.tex';                  //special "rules" card, back, added to the deck
 const blank_card  = latex_path + '00_blank.tex';                      //special blank card, added to pad A4 paper
+
+// MAIN GLOBAL VARIABLES
+// synchronous read and parse
+let input = ''; //content of csv file
+let cards = []; //parser csv
+
+//COMMAND LINE PROGRAM
 
 //create dir if not existent
 if (!fs.existsSync(img_path)){
@@ -35,28 +43,25 @@ if (!fs.existsSync(latex_path)){
 program
 .version('1.0')
 .description('Generate a deck of card from a csv file')
-.usage('[options] [content_file]')
-.option('-d, --download', 'download the images', undefined ,false)
-.option('-r, --resize', 'resize (existing) images', undefined ,true)
-.option('-9, --nine-by-page', undefined ,true)
-.option('-1, --one-by-page', undefined, true)
+.usage('[options] <content_file>')
+.option('-d, --download', 'download the images')
+.option('-r, --resize', 'resize (existing) images')
+.option('-g, --generate', 'generate LaTeX files, one per card')
+.option('-9, --nine-by-page', 'generate main LaTeX file with 9 cards by page')
+.option('-1, --one-by-page', 'generate main LaTeX file with one card by page')
 .parse(process.argv);
-
-//console.log(program.args);
 
 if (program.args.length !== 1)
   program.help();
 
-// MAIN GLOBAL VARIABLES
-// synchronous read and parse
-let content_file = default_content_file;
-if (process.argv[2])
-  content_file = process.argv[2];
+if (!fs.existsSync(program.args[0])){
+  console.error('File ' + program.args[0] + ' does not exist');
+  process.exit(1);
+}
 
-let input = fs.readFileSync(content_file);
 //format of csv is //id,type,title,year,picture,credits,description,credits_color//
-let cards = parse(input, {delimiter: ',', columns : true});
-
+input = fs.readFileSync(program.args[0]);
+cards = parse(input, {delimiter: ',', columns : true});
 
 //system call to resize images using image magick's convert
 function convert(input, output, x, y, dx, dy){
@@ -79,12 +84,16 @@ function resizer(input, output){
     }
     let ratio = metadata.height / metadata.width;
     //if the image is too much vertical
-    if (ratio > golden_ratio){
+    if (ratio > golden_ratio*(1 + ratio_threshold)){
       convert(input, output,  metadata.width, Math.round(metadata.width*golden_ratio), 0, Math.round((metadata.height-metadata.width*golden_ratio)/2) )
     }
     //if the image is too much horizontal. In that case, we have enough space to shift the cropped image on the "visible" part of the image
-    else{
+    else if (ratio < golden_ratio*(1 - ratio_threshold)){
       convert(input, output,  Math.round(metadata.height/golden_ratio), metadata.height, Math.round((metadata.width-(1+strip_width_percent)*metadata.height/golden_ratio)/2), 0 )
+    }
+    //ratio is good
+    else{
+      convert(input, output, metadata.width, metadata.height, 0, 0 );
     }
   });
 };
@@ -293,11 +302,12 @@ function generate_latex_nine_cards_by_page(){
 // console.log(cards);
 
 
-function download_and_resize_picture(card_obj){ 
+function download_and_resize_picture(card_obj, resize = false){ 
   //download and resize image to fit the size of a card
   download(card_obj.picture, pict_filename(card_obj, '_web_original'), () => {
     console.log(pict_filename(card_obj));
-    resizer(pict_filename(card_obj, '_web_original'), pict_filename(card_obj));
+    if (resize)
+      resizer(pict_filename(card_obj, '_web_original'), pict_filename(card_obj));
   });
   //resizer(pict_filename(card_obj, '_web_original'), pict_filename(card_obj));
   
@@ -305,16 +315,33 @@ function download_and_resize_picture(card_obj){
   // fs.writeFileSync(back_filename(card_obj),back_content(card_obj) );
 }
 
-//generates all .tex files
-function generate_all_contents(){
-  for(let i = 0; i < cards.length; i++){
-    download_and_resize_picture(cards[i]);
-    fs.writeFileSync(front_filename(cards[i]),front_content(cards[i]) );
-    fs.writeFileSync(back_filename(cards[i]),back_content(cards[i]) );
-  }
-}
-
-
 // generate_all_contents();
 // generate_latex_one_card_by_page();
 // generate_latex_nine_cards_by_page();
+
+
+
+// console.log('-d ' + program.download);
+// console.log('-r ' + program.resize);
+// console.log('-g ' + program.generate);
+// console.log('-1 ' + program.nineByPage);
+// console.log('-9 ' + program.oneByPage);
+
+//MAIN PROGRAM LOOP
+for(let i = 0; i < cards.length; i++){
+  let card_obj = cards[i];
+  if (program.download)
+    download_and_resize_picture(card_obj, program.resize);
+  if (!program.download && program.resize)
+    resizer(pict_filename(card_obj, '_web_original'), pict_filename(card_obj));
+  if (program.generate){
+    fs.writeFileSync(front_filename(card_obj),front_content(card_obj) );
+    fs.writeFileSync(back_filename(card_obj),back_content(card_obj) );
+  }
+}
+
+if (program.nineByPage)
+  generate_latex_nine_cards_by_page();
+
+if (program.oneByPage)
+  generate_latex_one_card_by_page();
