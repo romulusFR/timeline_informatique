@@ -9,7 +9,8 @@
 \pgfmathsetmacro{\imagewidth}{1*\cardwidth-2*\borderwidth}
 \pgfmathsetmacro{\imageheight}{1*\cardheight-2*\borderwidth}
 %% the image is AUTOMATICALLY RESIZED to fit the \imagewidth * \imageheight zone
-%% ratio for poker-sized deck:
+
+%% ratio for poker-sized deck, with 3mm bleeding:
 %%  w: 63.5-2*3 = 57.5
 %%    in px : 680
 %%  h: 88.9-2*3 = 82.9
@@ -17,11 +18,19 @@
 %%  w/h = 0.6936
 %%  h/w = 1.4417 (~13/9, ie 3R photo format)
 
+%% ratio for poker-sized deck, with 4mm bleeding:
+%%  w: 63.5-2*4 = 55.5
+%%    in px : 655.5
+%%  h: 88.9-2*4 = 80.9
+%%    in px : 955.5 (300 dpi)
+%%  w/h = 0.686
+%%  h/w = 1.4577
+
 \pgfmathsetmacro{\stripwidth}{0.100*\cardwidth}%{0.7} % 0.12
 %% strip is background for indices and title
 \pgfmathsetmacro{\strippadding}{0.0333*\cardwidth}%{0.2}
 %% padding around strips
-\pgfmathsetmacro{\textpadding}{0.0167*\cardwidth}%{0.1}
+\pgfmathsetmacro{\textpadding}{0.0167*\cardwidth}%{0.1} %0.0167
 %% padding for text
 
 \pgfmathsetmacro{\ratiocontent}{0.66}

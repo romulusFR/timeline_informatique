@@ -7,12 +7,12 @@ let {exec} = require('child_process');
 let program = require('commander');
 
 
-// height of images : (card_height - 2*borders) * 300dpi, here for a poker-sized deck (3.5 in)
-const golden_height = 980;
-// width of images : (card_width - 2*borders) * 300dpi, here for a poker-sized deck (2.5 in)
-const golden_width = 680;
+// height of images : (card_height - 2*borders) * 300dpi, here for a poker-sized deck (3.5 in) with border = 3mm
+const golden_height = 980; //980 955;
+// width of images : (card_width - 2*borders) * 300dpi, here for a poker-sized deck (2.5 in) with border = 3mm
+const golden_width = 680; //680 655
 const golden_ratio = golden_height/golden_width;
-// percentage of "visible" width, ie, tthe width of the card minus the width of the vertical strip and (2) strip paddings
+// percentage of "visible" width, ie, the width of the card minus the width of the vertical strip and (2) strip paddings
 const strip_width_percent = 0.1666;
 const ratio_threshold = 0.02;
 
