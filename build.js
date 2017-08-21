@@ -4,6 +4,7 @@ let request = require('request');
 let path = require('path');
 let im_meta = require('im-metadata');
 let {exec} = require('child_process');
+let program = require('commander');
 
 
 // height of images : (card_height - 2*borders) * 300dpi, here for a poker-sized deck (3.5 in)
@@ -13,8 +14,6 @@ const golden_width = 680;
 const golden_ratio = golden_height/golden_width;
 // percentage of "visible" width, ie, tthe width of the card minus the width of the vertical strip and (2) strip paddings
 const strip_width_percent = 0.1666;
-// ratio of the visible part of the image
-const corrected_ratio = golden_height/(golden_width*(1-strip_width_percent));
 
 const default_content_file = './Computer_history_timeline - Contenus.csv';
 const img_path = './deck/';                                           //where to store downloaded images 
@@ -33,6 +32,21 @@ if (!fs.existsSync(latex_path)){
   fs.mkdirSync(latex_path);
 }
 
+program
+.version('1.0')
+.description('Generate a deck of card from a csv file')
+.usage('[options] [content_file]')
+.option('-d, --download', 'download the images', undefined ,false)
+.option('-r, --resize', 'resize (existing) images', undefined ,true)
+.option('-9, --nine-by-page', undefined ,true)
+.option('-1, --one-by-page', undefined, true)
+.parse(process.argv);
+
+//console.log(program.args);
+
+if (program.args.length !== 1)
+  program.help();
+
 // MAIN GLOBAL VARIABLES
 // synchronous read and parse
 let content_file = default_content_file;
@@ -48,7 +62,7 @@ let cards = parse(input, {delimiter: ',', columns : true});
 function convert(input, output, x, y, dx, dy){
   let cmd = `convert ${input} -quality 98 -crop "${x}x${y}+${dx}+${dy}" -resize "${golden_width}x${golden_height}" ${output}`;
   console.log('exec: ' + cmd);
-  exec(cmd, (err, stdout, stderr) => {
+  exec(cmd, (err) => {
     if (err) {
       return;
     }
@@ -77,7 +91,7 @@ function resizer(input, output){
 
 //async download an image (or smtg else)
 function download(uri, filename, callback){
-  request.head(uri, function(err, res, body){
+  request.head(uri, function(){
     // console.log('content-type:', res.headers['content-type']);
     // console.log('content-length:', res.headers['content-length']);
     request(uri).pipe(fs.createWriteStream(filename)).on('close', callback);
@@ -146,26 +160,6 @@ function back_content(card_obj){
     \\cardtitle{${card_obj.title}}
     \\cardcontent{${card_obj.year}}{${card_obj.description}}
   \\end{tikzpicture}`;
-}
-
-
-function download_and_generate_contents(card_obj){ 
-  //download and resize image to fit the size of a card
-/*   download(card_obj.picture, pict_filename(card_obj, '_web_original'), () => {
-    console.log(pict_filename(card_obj));
-    resizer(pict_filename(card_obj, '_web_original'), pict_filename(card_obj));
-  }); */
-  resizer(pict_filename(card_obj, '_web_original'), pict_filename(card_obj));
-  
-  fs.writeFileSync(front_filename(card_obj),front_content(card_obj) );
-  fs.writeFileSync(back_filename(card_obj),back_content(card_obj) );
-}
-
-//generates all .tex files
-function generate_all_contents(){
-  for(let i = 0; i < cards.length; i++){
-    download_and_generate_contents(cards[i]);
-  }
 }
 
 function generate_latex_one_card_by_page(){
@@ -298,6 +292,29 @@ function generate_latex_nine_cards_by_page(){
 
 // console.log(cards);
 
-generate_all_contents();
-generate_latex_one_card_by_page();
-generate_latex_nine_cards_by_page();
+
+function download_and_resize_picture(card_obj){ 
+  //download and resize image to fit the size of a card
+  download(card_obj.picture, pict_filename(card_obj, '_web_original'), () => {
+    console.log(pict_filename(card_obj));
+    resizer(pict_filename(card_obj, '_web_original'), pict_filename(card_obj));
+  });
+  //resizer(pict_filename(card_obj, '_web_original'), pict_filename(card_obj));
+  
+  // fs.writeFileSync(front_filename(card_obj),front_content(card_obj) );
+  // fs.writeFileSync(back_filename(card_obj),back_content(card_obj) );
+}
+
+//generates all .tex files
+function generate_all_contents(){
+  for(let i = 0; i < cards.length; i++){
+    download_and_resize_picture(cards[i]);
+    fs.writeFileSync(front_filename(cards[i]),front_content(cards[i]) );
+    fs.writeFileSync(back_filename(cards[i]),back_content(cards[i]) );
+  }
+}
+
+
+// generate_all_contents();
+// generate_latex_one_card_by_page();
+// generate_latex_nine_cards_by_page();
