@@ -1,3 +1,7 @@
+%% ADAPTED FROM Arvid's tikz card template
+%% https://tex.stackexchange.com/questions/47924/creating-playing-cards-using-tikz
+%% https://tex.stackexchange.com/questions/243740/print-double-sided-playing-cards
+
 \pgfmathsetmacro{\cardwidth}{6.35}%{6.35}%{5.715} %
 %% width of card in cm. 5.715 = 2.25 in, 6.35 = 2.5 in
 \pgfmathsetmacro{\cardheight}{8.875}
@@ -133,7 +137,7 @@
     \clip \shapeBackground;
     \fill[elementcorners,contentbg,opacity=.85] \shapeContentArea;
   \end{scope}
-  \node[below right, align=justify, text width=(\imagewidth-2*\strippadding-\stripwidth-2*\textpadding)*1cm] at (2*\strippadding+\stripwidth+\borderwidth,\cardheight-\strippadding-\borderwidth) {
+  \node[below right, align=justify, text width=(\imagewidth-2*\strippadding-\stripwidth-2*\textpadding)*1cm] at (\borderwidth+2*\strippadding+\stripwidth+0*\textpadding,\cardheight-\textpadding-\borderwidth) {
     \centerline{\bf\Large #1}\\%
     {\footnotesize #2}
   };
