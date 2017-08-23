@@ -26,8 +26,8 @@ Les cartes sont créées à partir d'un fichier csv au format id,type,title,year
  * *credits_color* : couleur dans laquelle rendre les crédits de l'illustration
  
  
-Le fichier [./Computer_history_timeline - Contenus.csv](./Computer_history_timeline - Contenus.csv) contient l'ensemble des cartes du jeu.
-La carte des règles est gérée séparément, elle est décrite en dur dans le dépôt (fichiers [./deck/0_rules_front.tex](./deck/0_rules_front.tex) et  [./deck/0_rules_back.tex](./deck/0_rules_back.tex))
+Le fichier `./Computer_history_timeline - Contenus.csv` contient l'ensemble des cartes du jeu.
+La carte des règles est gérée séparément, elle est décrite en dur dans le dépôt (fichiers [./deck/0_rules_front.tex](./deck/0_rules_front.tex) et  [./deck/0_rules_back.tex](./deck/0_rules_back.tex)).
  
 ## Génération des cartes
 
