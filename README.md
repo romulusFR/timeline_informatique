@@ -24,7 +24,7 @@ Les cartes sont créées à partir d'un fichier csv au format id,type,title,year
  
  
 Le fichier [Computer_history_timeline - Contenus.csv](./Computer_history_timeline - Contenus.csv) contient l'ensemble des cartes du jeu.
-La carte des règles est gérée séparément, elle est décrite en dur dans le dépôt (fichiers [./dec/0_rules_front.tex](./deck/0_rules_front.tex) et  [./dec/0_rules_back.tex](./deck/0_rules_back.tex))
+La carte des règles est gérée séparément, elle est décrite en dur dans le dépôt (fichiers [./deck/0_rules_front.tex](./deck/0_rules_front.tex) et  [./deck/0_rules_back.tex](./deck/0_rules_back.tex))
  
 ## Génération des cartes
 
@@ -42,6 +42,6 @@ Ensuite, il faut compiler les fichiers .tex avec pdfLaTeX, voir le fichier [Make
  
 ## Jeu de test
 
-Le dossier [test_deck](test_deck) comprend quelques cartes de test.
+Le dossier [test_deck](test_deck) comprend quelques cartes de test, telles que générées à partir du csv. Elle servent à mettre au point ou modifier le fichier [./latex/tikzcards.tex](./latex/tikzcards.tex)
 
 
