@@ -23,6 +23,8 @@ Les cartes sont créées à partir d'un fichier csv au format id,type,title,year
  * *credits_color* : couleur dans laquelle rendre les crédits de l'illustration
  
  
+Le fichier [Computer_history_timeline - Contenus.csv](Computer_history_timeline - Contenus.csv) contient l'ensemble des cartes du jeu. La carte de règle est gérée séparément, elle est décrite en dur dans le dépôt (fichiers [./dec/0_rules_front.tex](./dec/0_rules_front.tex) et  [./dec/0_rules_back.tex](./dec/0_rules_back.tex))
+ 
 ## Génération des cartes
 
 Le script javascript [build.js](build.js) va parser le fichier csv de description pour :
