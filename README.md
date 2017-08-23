@@ -23,7 +23,7 @@ Les cartes sont créées à partir d'un fichier csv au format id,type,title,year
  * *credits_color* : couleur dans laquelle rendre les crédits de l'illustration
  
  
-Le fichier [Computer_history_timeline - Contenus.csv](./Computer_history_timeline - Contenus.csv) contient l'ensemble des cartes du jeu.
+Le fichier [./Computer_history_timeline - Contenus.csv](./Computer_history_timeline - Contenus.csv) contient l'ensemble des cartes du jeu.
 La carte des règles est gérée séparément, elle est décrite en dur dans le dépôt (fichiers [./deck/0_rules_front.tex](./deck/0_rules_front.tex) et  [./deck/0_rules_back.tex](./deck/0_rules_back.tex))
  
 ## Génération des cartes
@@ -38,7 +38,9 @@ Le script javascript [build.js](build.js) va parser le fichier csv de descriptio
  
 Exécuter `nodejs build.js --help` pour l'aide.
 
-Ensuite, il faut compiler les fichiers .tex avec pdfLaTeX, voir le fichier [Makefile](./Makefile)
+Ensuite, il faut compiler les fichiers .tex avec pdfLaTeX, voir le fichier [Makefile](./Makefile).
+
+Le rendu final est accessible [sur mon site](http://liris.cnrs.fr/romuald.thion/files/Communication/Timeline/)
  
 ## Jeu de test
 
