@@ -31,3 +31,7 @@ Un script javascript va parser le fichier csv de description pour
  - générer les .tex des cartes individuelles (un .tex pour le recto, un .tex pour le verso)
  - générer le jeu de cartes avec une face par page
  - générer le jeu de cartes avec neuf faces par page
+ 
+## Jeu de test
+
+Le dossier [test_deck](test_deck) comprend quelques cartes de test.
