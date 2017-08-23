@@ -4,14 +4,14 @@ Réalisé pour la fête de la science 2017 au département informatique de l'Uni
 
 ## Modèle de carte LaTeX
 
-Adapté de celui de Arvid
+Le modèle de carte LaTeX est adapté de celui de Arvid. Il utilise tikz, voir les fichiers [./latex/tikzcards.tex](./latex/tikzcards.tex) et [./latex/packages.tex](./latex/packages.tex)
 
  * https://tex.stackexchange.com/questions/47924/creating-playing-cards-using-tikz
  * https://tex.stackexchange.com/questions/243740/print-double-sided-playing-cards
  
 ## Contenu et description des cartes
  
- Les cartes sont créées à partir d'un fichier csv au format id,type,title,year,picture,credits,description,credits_color
+Les cartes sont créées à partir d'un fichier csv au format id,type,title,year,picture,credits,description,credits_color.
  
  * *id* : le numéro de la carte, n'apparait pas sur la carte
  * *type* : sont type à choisir dans *pop, hard, soft, lang, theory, game, web, univ* (apparait verticalement sur la gauche de la carte)
@@ -25,13 +25,20 @@ Adapté de celui de Arvid
  
 ## Génération des cartes
 
-Un script javascript va parser le fichier csv de description pour 
- - télécharger les images
- - les recadrer
- - générer les .tex des cartes individuelles (un .tex pour le recto, un .tex pour le verso)
- - générer le jeu de cartes avec une face par page
- - générer le jeu de cartes avec neuf faces par page
+Le script javascript [build.js](build.js) va parser le fichier csv de description pour :
+
+ - (-d) télécharger les images
+ - (-r) les recadrer
+ - (-g) générer les .tex des cartes individuelles (un .tex pour le recto, un .tex pour le verso)
+ - (-1) générer le jeu de cartes avec une face par page
+ - (-9) générer le jeu de cartes avec neuf faces par page
+ 
+Exécuter `nodejs build.js --help` pour l'aide.
+
+Ensuite, il faut compiler les fichiers .tex avec pdfLaTeX, voir le fichier [Makefile](./Makefile)
  
 ## Jeu de test
 
 Le dossier [test_deck](test_deck) comprend quelques cartes de test.
+
+

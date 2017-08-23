@@ -2,7 +2,7 @@ let fs = require('fs');
 let parse = require('csv-parse/lib/sync');
 let request = require('request');
 let path = require('path');
-let im_meta = require('im-metadata');
+let im_meta = require('im-metadata'); //TODO get rid of this lib
 let {exec} = require('child_process');
 let program = require('commander');
 
@@ -14,9 +14,10 @@ const golden_width = 680; //680 655
 const golden_ratio = golden_height/golden_width;
 // percentage of "visible" width, ie, the width of the card minus the width of the vertical strip and (2) strip paddings
 const strip_width_percent = 0.1666;
+// a n% threshold to avoid resizing cropping an image if its ratio is between golden_ratio*(1-ratio_threshold) and golden_ratio*(1+ratio_threshold)
 const ratio_threshold = 0.02;
 
-// const default_content_file = './Computer_history_timeline - Contenus.csv';
+//some configuration
 const img_path = './deck/';                                           //where to store downloaded images 
 const latex_path = './deck/';                                         //where to store generated .tex cards 
 const latex_one_card_by_page_name = './one_card_by_page.tex';         //main .tex with paper size set to the card
@@ -30,8 +31,6 @@ const blank_card  = latex_path + '00_blank.tex';                      //special 
 let input = ''; //content of csv file
 let cards = []; //parser csv
 
-//COMMAND LINE PROGRAM
-
 //create dir if not existent
 if (!fs.existsSync(img_path)){
   fs.mkdirSync(img_path);
@@ -40,6 +39,7 @@ if (!fs.existsSync(latex_path)){
   fs.mkdirSync(latex_path);
 }
 
+//COMMAND LINE PROGRAM
 program
 .version('1.0')
 .description('Generate a deck of card from a csv file')
@@ -130,7 +130,6 @@ function clean_french(string){
   return string;
 }
 
-
 //helpers
 function pict_filename(card_obj, suffix = ''){
   return img_path + card_obj.id + '_' + clean_french(card_obj.title) + suffix + path.extname(card_obj.picture);
@@ -160,6 +159,7 @@ function front_content(card_obj){
   \\end{tikzpicture}`;
 }
 
+// main content of .tex files associated to a card. uses macros in ./latex
 function back_content(card_obj){
   return`
   \\begin{tikzpicture}
@@ -171,6 +171,7 @@ function back_content(card_obj){
   \\end{tikzpicture}`;
 }
 
+// main pdf with one card per page
 function generate_latex_one_card_by_page(){
   let header =
   `\\documentclass[a4paper]{article}
@@ -188,6 +189,7 @@ function generate_latex_one_card_by_page(){
 
   let document = '';  
 
+    // the LaTeX document is basically the list of all cards
   for(let i = 0; i < cards.length; i++){
     document += `
     \\clearpage%
@@ -197,7 +199,7 @@ function generate_latex_one_card_by_page(){
     `;
   }
 
-  //manually deal with the rules
+  //manually deal with the rule card
   document += `
     \\clearpage%
     \\input{${rules_front}}%
@@ -211,6 +213,7 @@ function generate_latex_one_card_by_page(){
   fs.writeFileSync(latex_one_card_by_page_name, header + document + footer);
 }
 
+// main pdf with nine cards per page
 function generate_latex_nine_cards_by_page(){
   let header =
   `\\documentclass[a4paper]{article}
@@ -222,12 +225,11 @@ function generate_latex_nine_cards_by_page(){
 
   \\begin{document}%
   `
-
+  // a LaTeX tabular is used to create the 3x3 matrix
   let tabular_start = 
   `  \\begin{center}
     \\begin{tabular}{@{}c@{\\hspace{2mm}}c@{\\hspace{2mm}}c@{}}%
 `;
-
   let tabular_end = 
   `    \\end{tabular}
     \\end{center}%
@@ -236,7 +238,6 @@ function generate_latex_nine_cards_by_page(){
 
   let footer = 
   `\\end{document}`;
-
   let document = '';
 
   //key helper to pad the 3x3 tabular with cards
@@ -299,9 +300,6 @@ function generate_latex_nine_cards_by_page(){
   fs.writeFileSync(latex_nine_cards_by_page_name, header + document + footer);
 }
 
-// console.log(cards);
-
-
 function download_and_resize_picture(card_obj, resize = false){ 
   //download and resize image to fit the size of a card
   download(card_obj.picture, pict_filename(card_obj, '_web_original'), () => {
@@ -309,25 +307,9 @@ function download_and_resize_picture(card_obj, resize = false){
     if (resize)
       resizer(pict_filename(card_obj, '_web_original'), pict_filename(card_obj));
   });
-  //resizer(pict_filename(card_obj, '_web_original'), pict_filename(card_obj));
-  
-  // fs.writeFileSync(front_filename(card_obj),front_content(card_obj) );
-  // fs.writeFileSync(back_filename(card_obj),back_content(card_obj) );
 }
 
-// generate_all_contents();
-// generate_latex_one_card_by_page();
-// generate_latex_nine_cards_by_page();
-
-
-
-// console.log('-d ' + program.download);
-// console.log('-r ' + program.resize);
-// console.log('-g ' + program.generate);
-// console.log('-1 ' + program.nineByPage);
-// console.log('-9 ' + program.oneByPage);
-
-//MAIN PROGRAM LOOP
+//MAIN PROGRAM LOOP : card generation
 for(let i = 0; i < cards.length; i++){
   let card_obj = cards[i];
   if (program.download)
@@ -345,3 +327,5 @@ if (program.nineByPage)
 
 if (program.oneByPage)
   generate_latex_one_card_by_page();
+
+// console.log(cards);
