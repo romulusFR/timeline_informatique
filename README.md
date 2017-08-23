@@ -2,6 +2,9 @@
 
 Réalisé pour la fête de la science 2017 au département informatique de l'Université Claude Bernard Lyon 1.
 
+Le jeu est généré en PDF en utilisant LaTeX à partir de la description des cartes dans un fichier CSV.
+Le processus de génération est entièrement automatisé.
+
 ## Modèle de carte LaTeX
 
 Le modèle de carte LaTeX est adapté de celui de Arvid. Il utilise tikz, voir les fichiers [./latex/tikzcards.tex](./latex/tikzcards.tex) et [./latex/packages.tex](./latex/packages.tex)
