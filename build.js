@@ -6,6 +6,10 @@ tout ou partie du matériel la composant, dans le cas où vous effectuez un remi
 ou créez à partir du matériel composant l'oeuvre originale, vous devez diffuser l'Oeuvre modifiée dans les même conditions.
 
 https://creativecommons.org/licenses/by-nc-sa/3.0/fr/
+
+Le modèle LaTeX/Tikz est adapté de celui d'Arvid
+ https://tex.stackexchange.com/questions/47924/creating-playing-cards-using-tikz
+ https://tex.stackexchange.com/questions/243740/print-double-sided-playing-cards
 ************************************************************************************************************/
 
 let fs = require('fs');
