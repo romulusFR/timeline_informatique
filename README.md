@@ -12,18 +12,19 @@ Vous devez créditer l'Œuvre,vous n'êtes pas autorisé à faire un usage comme
 
 https://creativecommons.org/licenses/by-nc-sa/3.0/fr/
 
-_NOTA BENE_ : 
-
- * les contenus textuels des cartes est sous la licence wikipedia https://fr.wikipedia.org/wiki/Wikip%C3%A9dia:Citation_et_r%C3%A9utilisation_du_contenu_de_Wikip%C3%A9dia
- * les images des cartes sont créditées individuellement (domaine public, CHM Timeline, Wikipedia etc.)
-
-
-## Modèle de carte LaTeX
+### Modèle de carte LaTeX
 
 Le modèle de carte LaTeX est adapté de celui de Arvid. Il utilise tikz, voir les fichiers [./latex/tikzcards.tex](./latex/tikzcards.tex) et [./latex/packages.tex](./latex/packages.tex)
 
  * https://tex.stackexchange.com/questions/47924/creating-playing-cards-using-tikz
  * https://tex.stackexchange.com/questions/243740/print-double-sided-playing-cards
+
+
+### Licences des contenus
+
+ * les contenus textuels des cartes est [sous la licence wikipedia](https://fr.wikipedia.org/wiki/Wikip%C3%A9dia:Citation_et_r%C3%A9utilisation_du_contenu_de_Wikip%C3%A9dia)
+ * les images des cartes sont créditées individuellement (domaine public, CHM Timeline, Wikipedia etc.) dans les définitions des cartes
+
  
 ## Contenu et description des cartes
  
