@@ -7,8 +7,9 @@ Le processus de génération est entièrement automatisé.
 
 ## Licence
 
-Le présent projet est en licence Crative Commons BY-NC-SA 3.0
-Vous devez créditer l'Œuvre,vous n'êtes pas autorisé à faire un usage commercial de cette Oeuvre, tout ou partie du matériel la composant, dans le cas où vous effectuez un remix, que vous transformez, ou créez à partir du matériel composant l'Oeuvre originale, vous devez diffuser l'Oeuvre modifiée dans les même conditions.
+Le présent projet est en licence Crative Commons BY-NC-SA 3.0, par Romuald THION
+
+Vous devez créditer l'oeuvre, vous n'êtes pas autorisé à faire un usage commercial de cette oeuvre et de tout ou partie du matériel la composant. Dans le cas où vous effectuez un remix, que vous transformez, ou créez à partir du matériel composant l'oeuvre originale, vous devez diffuser l'oeuvre modifiée dans les même conditions.
 
 https://creativecommons.org/licenses/by-nc-sa/3.0/fr/
 
