@@ -5,6 +5,19 @@ Réalisé pour la fête de la science 2017 au département informatique de l'Uni
 Le jeu est généré en PDF en utilisant LaTeX à partir de la description des cartes dans un fichier CSV.
 Le processus de génération est entièrement automatisé.
 
+## Licence
+
+Le présent projet est en licence Crative Commons BY-NC-SA 3.0
+Vous devez créditer l'Œuvre,vous n'êtes pas autorisé à faire un usage commercial de cette Oeuvre, tout ou partie du matériel la composant, dans le cas où vous effectuez un remix, que vous transformez, ou créez à partir du matériel composant l'Oeuvre originale, vous devez diffuser l'Oeuvre modifiée dans les même conditions.
+
+https://creativecommons.org/licenses/by-nc-sa/3.0/fr/
+
+_NOTA BENE_ : 
+
+ * les contenus textuels des cartes est sous la licence wikipedia https://fr.wikipedia.org/wiki/Wikip%C3%A9dia:Citation_et_r%C3%A9utilisation_du_contenu_de_Wikip%C3%A9dia
+ * les images des cartes sont créditées individuellement (domaine public, CHM Timeline, Wikipedia etc.)
+
+
 ## Modèle de carte LaTeX
 
 Le modèle de carte LaTeX est adapté de celui de Arvid. Il utilise tikz, voir les fichiers [./latex/tikzcards.tex](./latex/tikzcards.tex) et [./latex/packages.tex](./latex/packages.tex)
