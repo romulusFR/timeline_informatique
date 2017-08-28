@@ -23,7 +23,7 @@ Le modèle de carte LaTeX est adapté de celui de Arvid. Il utilise tikz, voir l
 
 ### Licences des contenus
 
- * les contenus textuels des cartes est [sous la licence wikipedia](https://fr.wikipedia.org/wiki/Wikip%C3%A9dia:Citation_et_r%C3%A9utilisation_du_contenu_de_Wikip%C3%A9dia)
+ * les contenus textuels des cartes sont [sous licence CC BY-SA 3.0 de wikipedia](https://fr.wikipedia.org/wiki/Wikip%C3%A9dia:Citation_et_r%C3%A9utilisation_du_contenu_de_Wikip%C3%A9dia)
  * les images des cartes sont créditées individuellement (domaine public, CHM Timeline, Wikipedia etc.) dans les définitions des cartes
 
  
