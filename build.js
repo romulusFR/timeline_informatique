@@ -21,6 +21,8 @@ let {exec} = require('child_process');
 let program = require('commander');
 
 
+// /!\ WARNING /!\ changes on size parameters below HAVE TO BE PROPAGATED TO ./latex/tikzcards.tex as well !
+
 // height of images : (card_height - 2*borders) * 300dpi, here for a poker-sized deck (3.5 in) with border = 3mm
 const golden_height = 980; //980 955;
 // width of images : (card_width - 2*borders) * 300dpi, here for a poker-sized deck (2.5 in) with border = 3mm
@@ -113,11 +115,18 @@ function resizer(input, output){
 };
 
 //async download an image (or smtg else)
+//that function is quite "sensitive" to the uri
 function download(uri, filename, callback){
+  console.log(`download(${uri}, ${filename}, ...)`);
   request.head(uri, function(){
-    // console.log('content-type:', res.headers['content-type']);
-    // console.log('content-length:', res.headers['content-length']);
-    request(uri).pipe(fs.createWriteStream(filename)).on('close', callback);
+    request
+      .get(uri)
+      .on('error', function(err) {
+        console.log(err);
+        //TODO : enhance reporting here, or better, provide a default content file
+      })
+      .pipe(fs.createWriteStream(filename))
+      .on('close', callback);
   });
 };
 
