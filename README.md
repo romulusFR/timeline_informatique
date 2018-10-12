@@ -54,9 +54,10 @@ Le script javascript [build.js](build.js) va parser le fichier csv de descriptio
  - (-1) générer le jeu de cartes avec une face par page
  - (-9) générer le jeu de cartes avec neuf faces par page
  
-Exécuter `nodejs build.js --help` pour l'aide.
+Exécuter `nodejs build.js --help` pour l'aide. Pour tout regénérer (c-à-d, télécharger les images, les recadrer, générer les .tex individuels, le jeu une face par page et le jeu 9 faces par page) la commande est la suivante
+`nodejs build.js -d -r -g -1 -9  Computer_history_timeline\ -\ Contenus.csv`
 
-Ensuite, il faut compiler les fichiers .tex avec pdfLaTeX, voir le fichier [Makefile](./Makefile).
+Ensuite, il faut compiler les fichiers .tex avec pdfLaTeX, voir le fichier [Makefile](./Makefile). Pour tout regénérer, taper simplement `make`, la cible par défaut générant les pdfs avec une face par page et celui avec 9 faces par page .
 
 Le rendu final est accessible [sur mon site](http://liris.cnrs.fr/romuald.thion/files/Communication/Timeline/)
  
