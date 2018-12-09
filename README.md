@@ -32,7 +32,7 @@ Le modèle de carte LaTeX est adapté de celui de Arvid. Il utilise tikz, voir l
 Les cartes sont créées à partir d'un fichier csv au format id,type,title,year,picture,credits,description,credits_color.
  
  * *id* : le numéro de la carte, n'apparait pas sur la carte
- * *type* : sont type à choisir dans *pop, hard, soft, lang, theory, game, web, univ* (apparait verticalement sur la gauche de la carte)
+ * *type* : son type à choisir dans *pop, hard, soft, lang, theory, game, web, univ* (apparait verticalement sur la gauche de la carte)
  * *tile* : le nom de l'invention, de l'événement, de la personne ...
  * *year* : l'année de découverte (apparait avec le texte de la description au verso de la carte)
  * *picture* : une url vers une image dans un format supporté par pdfLaTeX
@@ -64,5 +64,3 @@ Le rendu final est accessible [sur mon site](http://liris.cnrs.fr/romuald.thion/
 ## Jeu de test
 
 Le dossier [test_deck](test_deck) comprend quelques cartes de test, telles que générées à partir du csv. Elle servent à mettre au point ou modifier le fichier [./latex/tikzcards.tex](./latex/tikzcards.tex)
-
-
