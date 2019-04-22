@@ -1,0 +1,41 @@
+{
+  "name": "timeline_informatique",
+  "version": "1.1.0",
+  "description": "A LaTeX (tickz) deck of card built from a csv file using javascript",
+  "main": "build.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/romulusFR/timeline_informatique.git"
+  },
+  "keywords": [
+    "csv",
+    "tikz",
+    "latex",
+    "cardgame",
+    "timeline",
+    "javascript",
+    "csv",
+    "computer",
+    "science"
+  ],
+  "author": "Romuald THION",
+  "license": "CC-BY-NC-SA-3.0",
+  "bugs": {
+    "url": "https://github.com/romulusFR/timeline_informatique/issues"
+  },
+  "homepage": "https://github.com/romulusFR/timeline_informatique#readme",
+  "dependencies": {
+    "commander": "^2.20.0",
+    "csv-parse": "^4.4.1",
+    "im-metadata": "^3.0.1",
+    "request": "^2.88.0"
+  },
+  "devDependencies": {
+    "eslint": "^5.16.0",
+    "eslint-config-airbnb-base": "^13.1.0",
+    "eslint-plugin-import": "^2.17.2"
+  }
+}

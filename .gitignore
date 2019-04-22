@@ -1,0 +1,9 @@
+*.aux
+*.log
+node_modules/
+backup/
+_deck/
+nine_cards_by_page.pdf
+nine_cards_by_page.tex
+one_card_by_page.pdf
+one_card_by_page.tex

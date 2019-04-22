@@ -1,0 +1,9 @@
+{
+  "MD007": { "indent": 4 },
+  "MD003" : {"style" : "setext_with_atx"},
+  "MD013" : false,
+  "MD024" : {"siblings_only" : true},
+  "MD025" : false,
+  "MD033" : false,
+  "MD036" : false
+}
