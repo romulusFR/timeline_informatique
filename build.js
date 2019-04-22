@@ -36,8 +36,9 @@ const strip_width_percent = 0.1666;
 const ratio_threshold = 0.02;
 
 // some configuration
-const img_path = './deck/'; // where to store downloaded images
-const latex_path = './deck/'; // where to store generated .tex cards
+const img_path = './img/'; // where to store downloaded images
+const output_path = './deck/'; // where to store downloaded images
+const latex_path = './latex/'; // where to store generated .tex cards
 const latex_one_card_by_page_name = './one_card_by_page.tex'; // main .tex with paper size set to the card
 const latex_nine_cards_by_page_name = './nine_cards_by_page.tex'; // main .tex with paper size set to A4, 3x3 cards by page
 const rules_front = `${latex_path}0_rules_front.tex`; // special "rules" card, front, added to the deck
@@ -53,8 +54,8 @@ let cards = []; // parser csv
 if (!fs.existsSync(img_path)) {
   fs.mkdirSync(img_path);
 }
-if (!fs.existsSync(latex_path)) {
-  fs.mkdirSync(latex_path);
+if (!fs.existsSync(output_path)) {
+  fs.mkdirSync(output_path);
 }
 
 // COMMAND LINE PROGRAM
