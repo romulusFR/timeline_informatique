@@ -134,28 +134,38 @@ function download(uri, filename, callback) {
   });
 }
 
-// to have courtesy file names
+// See https://stackoverflow.com/questions/990904/remove-accents-diacritics-in-a-string-in-javascript
 function clean_french(string) {
-  const accent = [
-    /[\300-\306]/g, /[\340-\346]/g, // A, a
-    /[\310-\313]/g, /[\350-\353]/g, // E, e
-    /[\314-\317]/g, /[\354-\357]/g, // I, i
-    /[\322-\330]/g, /[\362-\370]/g, // O, o
-    /[\331-\334]/g, /[\371-\374]/g, // U, u
-    /[\321]/g, /[\361]/g, // N, n
-    /[\307]/g, /[\347]/g, // C, c
-  ];
-  const noaccent = ['A', 'a', 'E', 'e', 'I', 'i', 'O', 'o', 'U', 'u', 'N', 'n', 'C', 'c'];
-  for (let i = 0; i < accent.length; i += 1) {
-    string = string.replace(accent[i], noaccent[i]);
-  }
+  // remove accent NFD = Normalization Form Canonical Decomposition.
+  const cleaned = string.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 
-  string = string.replace(/&/g, 'et');
-  string = string.replace(/[/\\?,.;:§!{}()\[\]']/g, '');
-  string = string.replace(/[ ]+/g, '_');
-  string = string.toLowerCase();
-  return string;
+  // replace all non word character from the basic Latin alphabet. Equivalent to [^A-Za-z0-9_].
+  // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions/Character_Classes
+  return cleaned.replace(/\W+/g, '_').toLowerCase();
 }
+
+// to have courtesy file names
+// function clean_french(string) {
+//   const accent = [
+//     /[\300-\306]/g, /[\340-\346]/g, // A, a
+//     /[\310-\313]/g, /[\350-\353]/g, // E, e
+//     /[\314-\317]/g, /[\354-\357]/g, // I, i
+//     /[\322-\330]/g, /[\362-\370]/g, // O, o
+//     /[\331-\334]/g, /[\371-\374]/g, // U, u
+//     /[\321]/g, /[\361]/g, // N, n
+//     /[\307]/g, /[\347]/g, // C, c
+//   ];
+//   const noaccent = ['A', 'a', 'E', 'e', 'I', 'i', 'O', 'o', 'U', 'u', 'N', 'n', 'C', 'c'];
+//   for (let i = 0; i < accent.length; i += 1) {
+//     string = string.replace(accent[i], noaccent[i]);
+//   }
+
+//   string = string.replace(/&/g, 'et');
+//   string = string.replace(/[/\\?,.;:§!{}()\[\]']/g, '');
+//   string = string.replace(/[ ]+/g, '_');
+//   string = string.toLowerCase();
+//   return string;
+// }
 
 // helpers
 function pict_filename(card_obj, suffix = '') {
@@ -173,6 +183,7 @@ function back_filename(card_obj) {
 
 // main content of .tex files associated to a card. uses macros in ./latex
 function front_content(card_obj) {
+  // eslint-disable-next-line no-param-reassign
   if (!card_obj.credits_color) { card_obj.credits_color = 'white'; }
 
   return `
@@ -311,19 +322,22 @@ function download_and_resize_picture(card_obj, resize = false) {
   });
 }
 
+// eslint-disable-next-line no-unused-vars
+function main() {
 // MAIN PROGRAM LOOP : card generation
-for (let i = 0; i < cards.length; i += 1) {
-  const card_obj = cards[i];
-  if (program.download) { download_and_resize_picture(card_obj, program.resize); }
-  if (!program.download && program.resize) { resizer(pict_filename(card_obj, '_web_original'), pict_filename(card_obj)); }
-  if (program.generate) {
-    fs.writeFileSync(front_filename(card_obj), front_content(card_obj));
-    fs.writeFileSync(back_filename(card_obj), back_content(card_obj));
+  for (let i = 0; i < cards.length; i += 1) {
+    const card_obj = cards[i];
+    if (program.download) { download_and_resize_picture(card_obj, program.resize); }
+    if (!program.download && program.resize) { resizer(pict_filename(card_obj, '_web_original'), pict_filename(card_obj)); }
+    if (program.generate) {
+      fs.writeFileSync(front_filename(card_obj), front_content(card_obj));
+      fs.writeFileSync(back_filename(card_obj), back_content(card_obj));
+    }
   }
+
+  if (program.nineByPage) { generate_latex_nine_cards_by_page(); }
+
+  if (program.oneByPage) { generate_latex_one_card_by_page(); }
 }
-
-if (program.nineByPage) { generate_latex_nine_cards_by_page(); }
-
-if (program.oneByPage) { generate_latex_one_card_by_page(); }
 
 // console.log(cards);

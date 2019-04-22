@@ -17,7 +17,7 @@ module.exports = {
       "no-restricted-syntax" : "off",
       "no-alert" : "off",
       "no-console" : "off",
-      "max-len": ['error', 100, 2, {
+      "max-len": ['error', 120, 2, {
         ignoreUrls: true,
         ignoreComments: true,
         ignoreRegExpLiterals: true,
