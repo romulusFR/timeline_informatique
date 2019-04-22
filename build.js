@@ -16,7 +16,8 @@ Le modèle LaTeX/Tikz est adapté de celui d'Arvid
 
 const fs = require('fs');
 const parse = require('csv-parse/lib/sync');
-const request = require('request');
+// const request = require('request');
+const fetch = require('node-fetch');
 const path = require('path');
 const im_meta = require('im-metadata'); // TODO get rid of this lib
 const { exec } = require('child_process');
@@ -123,16 +124,23 @@ function resizer(input, output) {
 // that function is quite "sensitive" to the uri
 function download(uri, filename, callback) {
   console.log(`download(${uri}, ${filename}, ...)`);
-  request.head(uri, () => {
-    request
-      .get(uri)
-      .on('error', (err) => {
-        console.log(err);
-        // TODO : enhance reporting here, or better, provide a default content file
-      })
-      .pipe(fs.createWriteStream(filename))
-      .on('close', callback);
-  });
+  fetch(uri)
+    .then((res) => {
+      const dest = fs.createWriteStream(filename);
+      res.body.pipe(dest);
+    })
+    .then(callback)
+    .catch(console.err);
+  // request.head(uri, () => {
+  //   request
+  //     .get(uri)
+  //     .on('error', (err) => {
+  //       console.log(err);
+  //       // TODO : enhance reporting here, or better, provide a default content file
+  //     })
+  //     .pipe(fs.createWriteStream(filename))
+  //     .on('close', callback);
+  // });
 }
 
 // See https://stackoverflow.com/questions/990904/remove-accents-diacritics-in-a-string-in-javascript
