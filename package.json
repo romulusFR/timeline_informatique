@@ -29,7 +29,7 @@
   "homepage": "https://github.com/romulusFR/timeline_informatique#readme",
   "dependencies": {
     "commander": "^2.20.0",
-    "csv-parse": "^4.4.1",
+    "csv-parse": "^4.4.6",
     "im-metadata": "^3.0.1",
     "node-fetch": "^2.3.0",
     "request": "^2.88.0"
