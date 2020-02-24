@@ -123,25 +123,24 @@ function resizer(input, output) {
 
 // async download an image (or smtg else)
 // that function is quite "sensitive" to the uri
+// https://www.npmjs.com/package/node-fetch
+function checkStatus(res) {
+  if (res.ok) { // res.status >= 200 && res.status < 300
+    return res;
+  }
+  throw new Error(res.statusText);
+}
+
 function download(uri, filename, callback) {
   debug(`download(${uri}, ${filename}, ...)`);
   fetch(uri)
+    .then(checkStatus)
     .then((res) => {
       const dest = fs.createWriteStream(filename);
       res.body.pipe(dest);
     })
     .then(callback)
     .catch(console.err);
-  // request.head(uri, () => {
-  //   request
-  //     .get(uri)
-  //     .on('error', (err) => {
-  //       console.log(err);
-  //       // TODO : enhance reporting here, or better, provide a default content file
-  //     })
-  //     .pipe(fs.createWriteStream(filename))
-  //     .on('close', callback);
-  // });
 }
 
 // See https://stackoverflow.com/questions/990904/remove-accents-diacritics-in-a-string-in-javascript
@@ -313,19 +312,27 @@ function download_and_resize_picture(card_obj, resize = false) {
 function main() {
 // MAIN PROGRAM LOOP : card generation
   for (let i = 0; i < cards.length; i += 1) {
-    debug(`Card #${i}`);
+    // debug(`Card #${i}`);
     const card_obj = cards[i];
-    if (program.download) { download_and_resize_picture(card_obj, program.resize); }
-    if (!program.download && program.resize) { resizer(pict_filename(card_obj, '_web_original'), pict_filename(card_obj)); }
+    if (program.download) {
+      download_and_resize_picture(card_obj, program.resize);
+    }
+    if (!program.download && program.resize) {
+      resizer(pict_filename(card_obj, '_web_original'), pict_filename(card_obj));
+    }
     if (program.generate) {
       fs.writeFileSync(front_filename(card_obj), front_content(card_obj));
       fs.writeFileSync(back_filename(card_obj), back_content(card_obj));
     }
   }
 
-  if (program.nineByPage) { generate_latex_nine_cards_by_page(); }
+  if (program.nineByPage) {
+    generate_latex_nine_cards_by_page();
+  }
 
-  if (program.oneByPage) { generate_latex_one_card_by_page(); }
+  if (program.oneByPage) {
+    generate_latex_one_card_by_page();
+  }
 }
 
 main();

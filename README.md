@@ -5,7 +5,7 @@ Réalisé pour la fête de la science 2017 au département informatique de l'Uni
 
 Le jeu est généré en PDF en utilisant LaTeX à partir de la description des cartes dans un fichier CSV.
 Le processus de génération **est entièrement automatisé**, ce qui inclut :
-  - le téléchargement des images (option `--download`);
+  - le téléchargement (et le renommage) des images (option `--download`);
   - le recentrage automatique (option `--resize`);
   - la génération des fichiers LaTeX
 
@@ -53,7 +53,7 @@ Génération des cartes
 Le script javascript [build.js](build.js) va parser le fichier csv de description pour :
 
 * `-d` ou `--download` : télécharger les images dont les urls sont données dans le csv (champ `picture`)
-* `-r` ou `--resize` : recadrer les images téléchargées 
+* `-r` ou `--resize` : recadrer des images (marche pour des images déjà téléchargées via `-r`)
 * `-g` ou `--generate` : générer les .tex des cartes individuelles (un .tex pour le recto, un .tex pour le verso)
 * `-1` ou `--nine-by-page` :  générer le jeu de cartes avec une face par page
 * `-2` ou `--one-by-page` : générer le jeu de cartes avec neuf faces par page
