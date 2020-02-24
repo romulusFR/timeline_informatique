@@ -24,7 +24,7 @@ const { exec } = require('child_process');
 const program = require('commander');
 
 // eslint-disable-next-line object-curly-newline
-const { name, version, homepage, description } = require('./package.json');
+const { name, version, homepage, description, main } = require('./package.json');
 
 // /!\ WARNING /!\ changes on size parameters below HAVE TO BE PROPAGATED TO ./latex/tikzcards.tex as well !
 
@@ -65,7 +65,8 @@ if (!fs.existsSync(output_path)) {
 // COMMAND LINE PROGRAM
 program
   .version(version)
-  .description(description)
+  .name(`nodejs ${main}`)
+  .description(`${description}\nSee ${homepage} for further help.`)
   .usage('[options] <content_file>')
   .option('-d, --download', 'download the images')
   .option('-r, --resize', 'resize (existing) images')
@@ -93,8 +94,6 @@ function convert(input, output, x, y, dx, dy) {
     if (err) {
       throw new Error(`error while executing convert: ${err}`);
     }
-    // console.log(`stdout: ${stdout}`);
-    // console.log(`stderr: ${stderr}`);
   });
 }
 
@@ -204,6 +203,7 @@ function back_content(card_obj) {
 
 // main pdf with one card per page
 function generate_latex_one_card_by_page() {
+  debug(`Generating 1 card by page for ${program.args[0]}`);
   const header = `\\documentclass[a4paper]{article}
 
   \\input{./${latex_path}/packages}
@@ -244,6 +244,7 @@ function generate_latex_one_card_by_page() {
 
 // main pdf with nine cards per page
 function generate_latex_nine_cards_by_page() {
+  debug(`Generating 3x3 plates for ${program.args[0]}`);
   const header = `\\documentclass[a4paper]{article}
 
   \\input{./${latex_path}/packages}
@@ -318,7 +319,7 @@ function download_and_resize_picture(card_obj, resize = false) {
 }
 
 // eslint-disable-next-line no-unused-vars
-function main() {
+function timeline() {
   debug(`Launching ${name} v${version}`);
   // MAIN PROGRAM LOOP : card generation
   for (let i = 0; i < cards.length; i += 1) {
@@ -345,4 +346,5 @@ function main() {
   }
 }
 
-main();
+// run the main program
+timeline();

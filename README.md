@@ -72,7 +72,10 @@ nodejs build.js  -g -1 -9 ./content/Computer_history_timeline\ -\ Contenus.csv
 # génération des planches
 nodejs build.js  -1 -9 ./content/Computer_history_timeline\ -\ Contenus.csv             
 ```
-Pour activer le mode debug, avec la bibliothèque [debug](https://www.npmjs.com/package/debug) il suffit de fixer la variable shell avec `DEBUG=* nodejs build.js ...`
+Pour activer le mode debug, avec la bibliothèque [debug](https://www.npmjs.com/package/debug) il suffit de fixer la variable shell `DEBUG` 
+```bash
+DEBUG=timeline nodejs build.js ...
+```
 
 Ensuite, il faut compiler les fichiers .tex avec pdfLaTeX, voir le fichier [Makefile](./Makefile). Pour tout regénérer, taper simplement `make`, la cible par défaut générant les pdfs avec une face par page et celui avec 9 faces par page en utilisant [rubber](https://launchpad.net/rubber/). Pour générer à la main, utiliser `pdflatex nine_cards_by_page.tex` ou `pdflatex one_card_by_page.tex`.
 
