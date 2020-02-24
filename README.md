@@ -50,6 +50,8 @@ La carte des règles est gérée séparément, elle est décrite en dur dans le 
 Génération des cartes
 ------------------------
 
+**BUG NON RESOLU : ne pas utiliser -d -et -r en même temps, le faire séparement**
+
 Le script javascript [build.js](build.js) va parser le fichier csv de description pour :
 
 * `-d` ou `--download` : télécharger les images dont les urls sont données dans le csv (champ `picture`)

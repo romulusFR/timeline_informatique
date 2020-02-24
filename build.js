@@ -92,7 +92,7 @@ function convert(input, output, x, y, dx, dy) {
   debug(`exec: ${cmd}`);
   exec(cmd, (err) => {
     if (err) {
-      // TODO
+      throw new Error(`error while executing convert: ${err}`);
     }
     // console.log(`stdout: ${stdout}`);
     // console.log(`stderr: ${stderr}`);
@@ -310,8 +310,9 @@ function generate_latex_nine_cards_by_page() {
 function download_and_resize_picture(card_obj, resize = false) {
   // download and resize image to fit the size of a card
   download(card_obj.picture, pict_filename(card_obj, '_web_original'), () => {
-    debug(pict_filename(card_obj));
-    if (resize) { resizer(pict_filename(card_obj, '_web_original'), pict_filename(card_obj)); }
+    if (resize) {
+      resizer(pict_filename(card_obj, '_web_original'), pict_filename(card_obj));
+    }
   });
 }
 
