@@ -14,9 +14,9 @@ Le modèle LaTeX/Tikz est adapté de celui d'Arvid
 
 'use strict';
 
+const debug = require('debug')('timeline');
 const fs = require('fs');
 const parse = require('csv-parse/lib/sync');
-// const request = require('request');
 const fetch = require('node-fetch');
 const path = require('path');
 const im_meta = require('im-metadata'); // TODO get rid of this lib
@@ -37,19 +37,20 @@ const strip_width_percent = 0.1666;
 const ratio_threshold = 0.02;
 
 // some configuration
+const special_path = './special_cards/'; // where special cards are stored
+const latex_path = './latex/'; // LaTeX templates are stored
 const img_path = './img/'; // where to store downloaded images
-const output_path = './deck/'; // where to store downloaded images
-const latex_path = './latex/'; // where to store generated .tex cards
+const output_path = './deck/'; // where to store generated .tex cards
 const latex_one_card_by_page_name = './one_card_by_page.tex'; // main .tex with paper size set to the card
 const latex_nine_cards_by_page_name = './nine_cards_by_page.tex'; // main .tex with paper size set to A4, 3x3 cards by page
-const rules_front = `${latex_path}0_rules_front.tex`; // special "rules" card, front, added to the deck
-const rules_back = `${latex_path}0_rules_back.tex`; // special "rules" card, back, added to the deck
-const blank_card = `${latex_path}00_blank.tex`; // special blank card, added to pad A4 paper
+const rules_front = `${special_path}0_rules_front.tex`; // special "rules" card, front, added to the deck
+const rules_back = `${special_path}0_rules_back.tex`; // special "rules" card, back, added to the deck
+const blank_card = `${special_path}00_blank.tex`; // special blank card, added to pad A4 paper
 
 // MAIN GLOBAL VARIABLES
 // synchronous read and parse
 let input_csv = ''; // content of csv file
-let cards = []; // parser csv
+let cards = []; // parsed csv
 
 // create dir if not existent
 if (!fs.existsSync(img_path)) {
@@ -61,7 +62,7 @@ if (!fs.existsSync(output_path)) {
 
 // COMMAND LINE PROGRAM
 program
-  .version('1.0')
+  .version('1.1')
   .description('Generate a deck of card from a csv file')
   .usage('[options] <content_file>')
   .option('-d, --download', 'download the images')
@@ -85,7 +86,7 @@ cards = parse(input_csv, { delimiter: ',', columns: true });
 // system call to resize images using image magick's convert
 function convert(input, output, x, y, dx, dy) {
   const cmd = `convert ${input} -quality 98 -crop "${x}x${y}+${dx}+${dy}" -resize "${golden_width}x${golden_height}" ${output}`;
-  console.log(`exec: ${cmd}`);
+  debug(`exec: ${cmd}`);
   exec(cmd, (err) => {
     if (err) {
       // TODO
@@ -123,7 +124,7 @@ function resizer(input, output) {
 // async download an image (or smtg else)
 // that function is quite "sensitive" to the uri
 function download(uri, filename, callback) {
-  console.log(`download(${uri}, ${filename}, ...)`);
+  debug(`download(${uri}, ${filename}, ...)`);
   fetch(uri)
     .then((res) => {
       const dest = fs.createWriteStream(filename);
@@ -152,29 +153,6 @@ function clean_french(string) {
   // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions/Character_Classes
   return cleaned.replace(/\W+/g, '_').toLowerCase();
 }
-
-// to have courtesy file names
-// function clean_french(string) {
-//   const accent = [
-//     /[\300-\306]/g, /[\340-\346]/g, // A, a
-//     /[\310-\313]/g, /[\350-\353]/g, // E, e
-//     /[\314-\317]/g, /[\354-\357]/g, // I, i
-//     /[\322-\330]/g, /[\362-\370]/g, // O, o
-//     /[\331-\334]/g, /[\371-\374]/g, // U, u
-//     /[\321]/g, /[\361]/g, // N, n
-//     /[\307]/g, /[\347]/g, // C, c
-//   ];
-//   const noaccent = ['A', 'a', 'E', 'e', 'I', 'i', 'O', 'o', 'U', 'u', 'N', 'n', 'C', 'c'];
-//   for (let i = 0; i < accent.length; i += 1) {
-//     string = string.replace(accent[i], noaccent[i]);
-//   }
-
-//   string = string.replace(/&/g, 'et');
-//   string = string.replace(/[/\\?,.;:§!{}()\[\]']/g, '');
-//   string = string.replace(/[ ]+/g, '_');
-//   string = string.toLowerCase();
-//   return string;
-// }
 
 // helpers
 function pict_filename(card_obj, suffix = '') {
@@ -326,7 +304,7 @@ function generate_latex_nine_cards_by_page() {
 function download_and_resize_picture(card_obj, resize = false) {
   // download and resize image to fit the size of a card
   download(card_obj.picture, pict_filename(card_obj, '_web_original'), () => {
-    console.log(pict_filename(card_obj));
+    debug(pict_filename(card_obj));
     if (resize) { resizer(pict_filename(card_obj, '_web_original'), pict_filename(card_obj)); }
   });
 }
@@ -335,6 +313,7 @@ function download_and_resize_picture(card_obj, resize = false) {
 function main() {
 // MAIN PROGRAM LOOP : card generation
   for (let i = 0; i < cards.length; i += 1) {
+    debug(`Card #${i}`);
     const card_obj = cards[i];
     if (program.download) { download_and_resize_picture(card_obj, program.resize); }
     if (!program.download && program.resize) { resizer(pict_filename(card_obj, '_web_original'), pict_filename(card_obj)); }
@@ -349,4 +328,4 @@ function main() {
   if (program.oneByPage) { generate_latex_one_card_by_page(); }
 }
 
-// console.log(cards);
+main();

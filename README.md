@@ -4,7 +4,10 @@ Projet de jeu de carte "Timeline Informatique"
 Réalisé pour la fête de la science 2017 au département informatique de l'Université Claude Bernard Lyon 1.
 
 Le jeu est généré en PDF en utilisant LaTeX à partir de la description des cartes dans un fichier CSV.
-Le processus de génération est entièrement automatisé.
+Le processus de génération **est entièrement automatisé**, ce qui inclut :
+  - le téléchargement des images (option `--download`);
+  - le recentrage automatique (option `--resize`);
+  - la génération des fichiers LaTeX
 
 Licence
 -------
@@ -30,7 +33,7 @@ Le modèle de carte LaTeX est adapté de celui de Arvid. Il utilise tikz, voir l
 Contenu et description des cartes
 -----------------------------------
 
-Les cartes sont créées à partir d'un fichier csv au format id,type,title,year,picture,credits,description,credits_color.
+Les cartes sont créées à partir d'un fichier csv au format `id,type,title,year,picture,credits,description,credits_color`.
 
 * *id* : le numéro de la carte, n'apparait pas sur la carte
 * *type* : son type à choisir dans *pop, hard, soft, lang, theory, game, web, univ* (apparait verticalement sur la gauche de la carte)
@@ -49,14 +52,14 @@ Génération des cartes
 
 Le script javascript [build.js](build.js) va parser le fichier csv de description pour :
 
-* (-d) télécharger les images
-* (-r) les recadrer
-* (-g) générer les .tex des cartes individuelles (un .tex pour le recto, un .tex pour le verso)
-* (-1) générer le jeu de cartes avec une face par page
-* (-9) générer le jeu de cartes avec neuf faces par page
+* `-d` ou `--download` : télécharger les images dont les urls sont données dans le csv (champ `picture`)
+* `-r` ou `--resize` : recadrer les images téléchargées 
+* `-g` ou `--generate` : générer les .tex des cartes individuelles (un .tex pour le recto, un .tex pour le verso)
+* `-1` ou `--nine-by-page` :  générer le jeu de cartes avec une face par page
+* `-2` ou `--one-by-page` : générer le jeu de cartes avec neuf faces par page
 
 Exécuter `nodejs build.js --help` pour l'aide. Pour tout regénérer (c-à-d, télécharger les images, les recadrer, générer les .tex individuels, le jeu une face par page et le jeu 9 faces par page) la commande est la suivante
-`nodejs build.js -d -r -g -1 -9  Computer_history_timeline\ -\ Contenus.csv`
+`nodejs build.js -d -r -g -1 -9  ./content/Computer_history_timeline\ -\ Contenus.csv`
 
 Ensuite, il faut compiler les fichiers .tex avec pdfLaTeX, voir le fichier [Makefile](./Makefile). Pour tout regénérer, taper simplement `make`, la cible par défaut générant les pdfs avec une face par page et celui avec 9 faces par page .
 
