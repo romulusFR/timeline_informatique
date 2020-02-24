@@ -7,7 +7,8 @@ Le jeu est généré en PDF en utilisant LaTeX à partir de la description des c
 Le processus de génération **est entièrement automatisé**, ce qui inclut :
   - le téléchargement (et le renommage) des images (option `--download`);
   - le recentrage automatique (option `--resize`);
-  - la génération des fichiers LaTeX
+  - la génération des fichiers LaTeX individuels (un verso, un recto) (option `--generate`);
+  - la génération des planches LaTeX (soit 1 soit 9 carte par page) avec padding de cartes blanches si le nombre de cartes n'est pas multiple de 9 (options `--nine-by-page` et `--one-by-page`);
 
 Licence
 -------
@@ -60,10 +61,20 @@ Le script javascript [build.js](build.js) va parser le fichier csv de descriptio
 * `-1` ou `--nine-by-page` :  générer le jeu de cartes avec une face par page
 * `-2` ou `--one-by-page` : générer le jeu de cartes avec neuf faces par page
 
-Exécuter `nodejs build.js --help` pour l'aide. Pour tout regénérer (c-à-d, télécharger les images, les recadrer, générer les .tex individuels, le jeu une face par page et le jeu 9 faces par page) la commande est la suivante
-`nodejs build.js -d -r -g -1 -9  ./content/Computer_history_timeline\ -\ Contenus.csv`
+Exécuter `nodejs build.js --help` pour l'aide. Pour tout regénérer (c-à-d, télécharger les images, les recadrer, générer les .tex individuels, le jeu une face par page et le jeu 9 faces par page) les commandes sont les suivantes
+```bash
+# download
+nodejs build.js -d  ./content/Computer_history_timeline\ -\ Contenus.csv            
+# resize des images
+nodejs build.js -r  ./content/Computer_history_timeline\ -\ Contenus.csv   
+# generation des cartes individuelles .tex
+nodejs build.js  -g -1 -9 ./content/Computer_history_timeline\ -\ Contenus.csv             
+# génération des planches
+nodejs build.js  -1 -9 ./content/Computer_history_timeline\ -\ Contenus.csv             
+```
+Pour activer le mode debug, avec la bibliothèque [debug](https://www.npmjs.com/package/debug) il suffit de fixer la variable shell avec `DEBUG=* nodejs build.js ...`
 
-Ensuite, il faut compiler les fichiers .tex avec pdfLaTeX, voir le fichier [Makefile](./Makefile). Pour tout regénérer, taper simplement `make`, la cible par défaut générant les pdfs avec une face par page et celui avec 9 faces par page .
+Ensuite, il faut compiler les fichiers .tex avec pdfLaTeX, voir le fichier [Makefile](./Makefile). Pour tout regénérer, taper simplement `make`, la cible par défaut générant les pdfs avec une face par page et celui avec 9 faces par page en utilisant [rubber](https://launchpad.net/rubber/). Pour générer à la main, utiliser `pdflatex nine_cards_by_page.tex` ou `pdflatex one_card_by_page.tex`.
 
 Le rendu final est accessible [sur mon site](http://liris.cnrs.fr/romuald.thion/files/Communication/Timeline/)
 

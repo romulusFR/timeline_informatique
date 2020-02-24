@@ -1,3 +1,5 @@
+'use strict';
+
 /** *********************************************************************************************************
 Le présent projet est en licence Crative Commons BY-NC-SA 3.0, Romuald THION.
 
@@ -12,8 +14,6 @@ Le modèle LaTeX/Tikz est adapté de celui d'Arvid
  https://tex.stackexchange.com/questions/243740/print-double-sided-playing-cards
 *********************************************************************************************************** */
 
-'use strict';
-
 const debug = require('debug')('timeline');
 const fs = require('fs');
 const parse = require('csv-parse/lib/sync');
@@ -23,6 +23,7 @@ const im_meta = require('im-metadata'); // TODO get rid of this lib
 const { exec } = require('child_process');
 const program = require('commander');
 
+// eslint-disable-next-line object-curly-newline
 const { name, version, homepage, description } = require('./package.json');
 
 // /!\ WARNING /!\ changes on size parameters below HAVE TO BE PROPAGATED TO ./latex/tikzcards.tex as well !
@@ -61,8 +62,6 @@ if (!fs.existsSync(output_path)) {
   fs.mkdirSync(output_path);
 }
 
-
-debug(`Launching ${name} v${version}`);
 // COMMAND LINE PROGRAM
 program
   .version(version)
@@ -136,7 +135,7 @@ function checkStatus(res) {
 
 function download(uri, filename, callback) {
   // Set User-Agent as required by https://meta.wikimedia.org/wiki/User-Agent_policy
-  //  <client name>/<version> (<contact information>) <library/framework name>/<version> [<library name>/<version> ...]. 
+  //  <client name>/<version> (<contact information>) <library/framework name>/<version> [<library name>/<version> ...].
   const agent = `${name}/${version} (${homepage}) node-fetch/2.6`;
   const opts = { headers: { 'User-Agent': agent } };
   debug(`download(${uri}, ${filename}, ...)`);
@@ -168,14 +167,15 @@ function card_type(str) {
   return `\\cardtype${str.charAt(0).toUpperCase()}${str.slice(1)}`;
 }
 function front_filename(card_obj) {
-  return `${latex_path + card_obj.id}_${clean_french(card_obj.title)}_front.tex`;
+  return `${output_path + card_obj.id}_${clean_french(card_obj.title)}_front.tex`;
 }
 function back_filename(card_obj) {
-  return `${latex_path + card_obj.id}_${clean_french(card_obj.title)}_back.tex`;
+  return `${output_path + card_obj.id}_${clean_french(card_obj.title)}_back.tex`;
 }
 
 // main content of .tex files associated to a card. uses macros in ./latex
 function front_content(card_obj) {
+  debug(`front_content ${card_obj.title}`);
   // eslint-disable-next-line no-param-reassign
   if (!card_obj.credits_color) { card_obj.credits_color = 'white'; }
 
@@ -191,6 +191,7 @@ function front_content(card_obj) {
 
 // main content of .tex files associated to a card. uses macros in ./latex
 function back_content(card_obj) {
+  debug(`back_content ${card_obj.title}`);
   return `
   \\begin{tikzpicture}
     \\cardborder
@@ -205,8 +206,8 @@ function back_content(card_obj) {
 function generate_latex_one_card_by_page() {
   const header = `\\documentclass[a4paper]{article}
 
-  \\input{./latex/packages}
-  \\input{./latex/tikzcards}
+  \\input{./${latex_path}/packages}
+  \\input{./${latex_path}/tikzcards}
 
   \\geometry{
     paperheight= 88.9mm, %see \\cardheight cm,
@@ -245,8 +246,8 @@ function generate_latex_one_card_by_page() {
 function generate_latex_nine_cards_by_page() {
   const header = `\\documentclass[a4paper]{article}
 
-  \\input{./latex/packages}
-  \\input{./latex/tikzcards}
+  \\input{./${latex_path}/packages}
+  \\input{./${latex_path}/tikzcards}
 
   \\geometry{hmargin=5mm, vmargin=10mm}
 
@@ -318,7 +319,8 @@ function download_and_resize_picture(card_obj, resize = false) {
 
 // eslint-disable-next-line no-unused-vars
 function main() {
-// MAIN PROGRAM LOOP : card generation
+  debug(`Launching ${name} v${version}`);
+  // MAIN PROGRAM LOOP : card generation
   for (let i = 0; i < cards.length; i += 1) {
     // debug(`Card #${i}`);
     const card_obj = cards[i];
