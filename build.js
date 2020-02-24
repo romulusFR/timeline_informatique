@@ -23,6 +23,7 @@ const im_meta = require('im-metadata'); // TODO get rid of this lib
 const { exec } = require('child_process');
 const program = require('commander');
 
+const { name, version, homepage, description } = require('./package.json');
 
 // /!\ WARNING /!\ changes on size parameters below HAVE TO BE PROPAGATED TO ./latex/tikzcards.tex as well !
 
@@ -60,10 +61,12 @@ if (!fs.existsSync(output_path)) {
   fs.mkdirSync(output_path);
 }
 
+
+debug(`Launching ${name} v${version}`);
 // COMMAND LINE PROGRAM
 program
-  .version('1.1')
-  .description('Generate a deck of card from a csv file')
+  .version(version)
+  .description(description)
   .usage('[options] <content_file>')
   .option('-d, --download', 'download the images')
   .option('-r, --resize', 'resize (existing) images')
@@ -132,8 +135,12 @@ function checkStatus(res) {
 }
 
 function download(uri, filename, callback) {
+  // Set User-Agent as required by https://meta.wikimedia.org/wiki/User-Agent_policy
+  //  <client name>/<version> (<contact information>) <library/framework name>/<version> [<library name>/<version> ...]. 
+  const agent = `${name}/${version} (${homepage}) node-fetch/2.6`;
+  const opts = { headers: { 'User-Agent': agent } };
   debug(`download(${uri}, ${filename}, ...)`);
-  fetch(uri)
+  fetch(uri, opts)
     .then(checkStatus)
     .then((res) => {
       const dest = fs.createWriteStream(filename);
