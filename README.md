@@ -3,6 +3,9 @@ Projet de jeu de carte "Timeline Informatique"
 
 Réalisé pour la fête de la science 2017 au département informatique de l'Université Claude Bernard Lyon 1.
 
+Présentation
+------------
+
 Le jeu est généré en PDF en utilisant LaTeX à partir de la description des cartes dans un fichier CSV.
 Le processus de génération **est entièrement automatisé**, ce qui inclut :
 
@@ -12,12 +15,28 @@ Le processus de génération **est entièrement automatisé**, ce qui inclut :
   - la génération des fichiers LaTeX individuels (un verso, un recto) (option `--generate`);
   - la génération des planches LaTeX (soit 1 soit 9 carte par page) avec padding de cartes blanches si le nombre de cartes n'est pas multiple de 9 (options `--nine-by-page` et `--one-by-page`);
 
-Dépendences
------------
+La génération de carte dans un autre format que les cartes poker (par défaut) n'est _pas complètement automatisée_, elle nécessite de modifier les bases de cartes LaTeX.
 
-* les dépendences Node.js sont gérées via npm;
+### Dépendances
+
+* Node.js et npm pour gérer les dépendances Node.js;
+* le recentrage automatique nécessite [ImageMagick](https://imagemagick.org/index.php);
 * la génération des `.pdf` finaux nécessite une chaine `pdflatex` avec TikZ;
-* le recentrage automatique nécessite [ImageMagick](https://imagemagick.org/index.php).
+* éventuellement, `Makefile` et `rubber` pour la génération.
+
+
+### Installation et exécution
+
+```bash
+git clone https://github.com/romulusFR/timeline_informatique.git
+npm install
+
+nodejs build.js -drg19 ./content/computer_history_timeline.csv
+make
+
+# one_card_by_page.pdf
+# nine_cards_by_page.pdf
+```
 
 Licence
 -------
