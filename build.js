@@ -49,47 +49,11 @@ const rules_front = `${special_path}0_rules_front.tex`; // special "rules" card,
 const rules_back = `${special_path}0_rules_back.tex`; // special "rules" card, back, added to the deck
 const blank_card = `${special_path}00_blank.tex`; // special blank card, added to pad A4 paper
 
-// MAIN GLOBAL VARIABLES
-// synchronous read and parse
-let input_csv = ''; // content of csv file
-let cards = []; // parsed csv
-
-// create dir if not existent
-if (!fs.existsSync(img_path)) {
-  fs.mkdirSync(img_path);
-}
-if (!fs.existsSync(output_path)) {
-  fs.mkdirSync(output_path);
-}
-
-// COMMAND LINE PROGRAM
-program
-  .version(version)
-  .name(`nodejs ${main}`)
-  .description(`${description}\nSee ${homepage} for further help.`)
-  .usage('[options] <content_file>')
-  .option('-d, --download', 'download the images')
-  .option('-r, --resize', 'resize (existing) images')
-  .option('-g, --generate', 'generate LaTeX files, one per card')
-  .option('-9, --nine-by-page', 'generate main LaTeX file with 9 cards by page')
-  .option('-1, --one-by-page', 'generate main LaTeX file with one card by page')
-  .parse(process.argv);
-
-if (program.args.length !== 1) { program.help(); }
-
-if (!fs.existsSync(program.args[0])) {
-  console.error(`File ${program.args[0]} does not exist`);
-  process.exit(1);
-}
-
-// format of csv is //id,type,title,year,picture,credits,description,credits_color//
-input_csv = fs.readFileSync(program.args[0]);
-cards = parse(input_csv, { delimiter: ',', columns: true });
-
 // system call to resize images using image magick's convert
+// see https://imagemagick.org/script/convert.php
 function convert(input, output, x, y, dx, dy) {
   const cmd = `convert ${input} -quality 98 -crop "${x}x${y}+${dx}+${dy}" -resize "${golden_width}x${golden_height}" ${output}`;
-  debug(`exec: ${cmd}`);
+  debug(`Exec: ${cmd}`);
   exec(cmd, (err) => {
     if (err) {
       throw new Error(`error while executing convert: ${err}`);
@@ -99,7 +63,7 @@ function convert(input, output, x, y, dx, dy) {
 
 // resize images according to their format wrt the ideal one
 function resizer(input, output) {
-  im_meta(input, {}, (error, metadata) => {
+  im_meta(input, (error, metadata) => {
     if (error) {
       console.error(error);
     }
@@ -137,14 +101,14 @@ function download(uri, filename, callback) {
   //  <client name>/<version> (<contact information>) <library/framework name>/<version> [<library name>/<version> ...].
   const agent = `${name}/${version} (${homepage}) node-fetch/2.6`;
   const opts = { headers: { 'User-Agent': agent } };
-  debug(`download(${uri}, ${filename}, ...)`);
+  debug(`Downloading (${uri}, ${filename}, ...)`);
   fetch(uri, opts)
     .then(checkStatus)
     .then((res) => {
       const dest = fs.createWriteStream(filename);
       res.body.pipe(dest);
+      dest.on('finish', callback);
     })
-    .then(callback)
     .catch(console.err);
 }
 
@@ -170,6 +134,18 @@ function front_filename(card_obj) {
 }
 function back_filename(card_obj) {
   return `${output_path + card_obj.id}_${clean_french(card_obj.title)}_back.tex`;
+}
+
+function download_and_resize_picture(card_obj, resize = false) {
+  // download and resize image to fit the size of a card
+  // resizer(pict_filename(card_obj, '_web_original'), pict_filename(card_obj));
+  const filename = pict_filename(card_obj, '_web_original');
+  download(card_obj.picture, filename, () => {
+    if (resize) {
+      debug(`...Downloaded (${filename})`);
+      resizer(filename, pict_filename(card_obj));
+    }
+  });
 }
 
 // main content of .tex files associated to a card. uses macros in ./latex
@@ -202,7 +178,7 @@ function back_content(card_obj) {
 }
 
 // main pdf with one card per page
-function generate_latex_one_card_by_page() {
+function generate_latex_one_card_by_page(cards) {
   debug(`Generating 1 card by page for ${program.args[0]}`);
   const header = `\\documentclass[a4paper]{article}
 
@@ -243,7 +219,7 @@ function generate_latex_one_card_by_page() {
 }
 
 // main pdf with nine cards per page
-function generate_latex_nine_cards_by_page() {
+function generate_latex_nine_cards_by_page(cards) {
   debug(`Generating 3x3 plates for ${program.args[0]}`);
   const header = `\\documentclass[a4paper]{article}
 
@@ -309,21 +285,11 @@ function generate_latex_nine_cards_by_page() {
   fs.writeFileSync(latex_nine_cards_by_page_name, header + document + footer);
 }
 
-function download_and_resize_picture(card_obj, resize = false) {
-  // download and resize image to fit the size of a card
-  download(card_obj.picture, pict_filename(card_obj, '_web_original'), () => {
-    if (resize) {
-      resizer(pict_filename(card_obj, '_web_original'), pict_filename(card_obj));
-    }
-  });
-}
-
 // eslint-disable-next-line no-unused-vars
-function timeline() {
+function timeline(cards) {
   debug(`Launching ${name} v${version}`);
   // MAIN PROGRAM LOOP : card generation
   for (let i = 0; i < cards.length; i += 1) {
-    // debug(`Card #${i}`);
     const card_obj = cards[i];
     if (program.download) {
       download_and_resize_picture(card_obj, program.resize);
@@ -338,13 +304,52 @@ function timeline() {
   }
 
   if (program.nineByPage) {
-    generate_latex_nine_cards_by_page();
+    generate_latex_nine_cards_by_page(cards);
   }
 
   if (program.oneByPage) {
-    generate_latex_one_card_by_page();
+    generate_latex_one_card_by_page(cards);
   }
 }
 
+
+// COMMAND LINE PROGRAM
+program
+  .version(version)
+  .name(`nodejs ${main}`)
+  .description(`${description}\nSee ${homepage} for further help.`)
+  .usage('[options] <content_file>')
+  .option('-d, --download', 'download the images')
+  .option('-r, --resize', 'resize (existing) images')
+  .option('-g, --generate', 'generate LaTeX files, one per card')
+  .option('-9, --nine-by-page', 'generate main LaTeX file with 9 cards by page')
+  .option('-1, --one-by-page', 'generate main LaTeX file with one card by page')
+  .parse(process.argv);
+
+if (program.args.length !== 1) { program.help(); }
+
+// MAIN GLOBAL VARIABLES AND PROGRAM
+// synchronous read and parse
+let input_csv = ''; // content of csv file
+let input_cards = []; // parsed csv
+
+// create dir if not existent
+if (!fs.existsSync(img_path)) {
+  fs.mkdirSync(img_path);
+}
+if (!fs.existsSync(output_path)) {
+  fs.mkdirSync(output_path);
+}
+
+// format of csv is //id,type,title,year,picture,credits,description,credits_color//
+input_csv = fs.readFileSync(program.args[0]);
+input_cards = parse(input_csv, { delimiter: ',', columns: true });
+debug(`Read ${input_cards.length} cards from ${program.args[0]}`);
+
+if (!fs.existsSync(program.args[0])) {
+  console.error(`File ${program.args[0]} does not exist`);
+  process.exit(1);
+}
+
 // run the main program
-timeline();
+timeline(input_cards);

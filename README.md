@@ -5,13 +5,24 @@ Réalisé pour la fête de la science 2017 au département informatique de l'Uni
 
 Le jeu est généré en PDF en utilisant LaTeX à partir de la description des cartes dans un fichier CSV.
 Le processus de génération **est entièrement automatisé**, ce qui inclut :
-  - le téléchargement (et le renommage) des images (option `--download`);
-  - le recentrage automatique (option `--resize`);
+
+  - le téléchargement des images (option `--download`);
+  - le renommage des images télécharges
+  - le recentrage automatique (option `--resize`) des images;
   - la génération des fichiers LaTeX individuels (un verso, un recto) (option `--generate`);
   - la génération des planches LaTeX (soit 1 soit 9 carte par page) avec padding de cartes blanches si le nombre de cartes n'est pas multiple de 9 (options `--nine-by-page` et `--one-by-page`);
 
+Dépendences
+-----------
+
+* les dépendences Node.js sont gérées via npm;
+* la génération des `.pdf` finaux nécessite une chaine `pdflatex` avec TikZ;
+* le recentrage automatique nécessite [ImageMagick](https://imagemagick.org/index.php).
+
 Licence
 -------
+
+### Licence du projet
 
 Le présent projet est en licence Crative Commons BY-NC-SA 3.0, par Romuald THION
 
@@ -21,7 +32,7 @@ Vous devez créditer l'oeuvre, vous n'êtes pas autorisé à faire un usage comm
 
 ### Modèle de carte LaTeX
 
-Le modèle de carte LaTeX est adapté de celui de Arvid. Il utilise tikz, voir les fichiers [./latex/tikzcards.tex](./latex/tikzcards.tex) et [./latex/packages.tex](./latex/packages.tex)
+Le modèle de carte LaTeX est adapté de celui de Arvid. Il utilise TikZ, voir les fichiers [./latex/tikzcards.tex](./latex/tikzcards.tex) et [./latex/packages.tex](./latex/packages.tex)
 
 * <https://tex.stackexchange.com/questions/47924/creating-playing-cards-using-tikz>
 * <https://tex.stackexchange.com/questions/243740/print-double-sided-playing-cards>
@@ -45,15 +56,13 @@ Les cartes sont créées à partir d'un fichier csv au format `id,type,title,yea
 * *description* : court texte (apparait au verso de la carte)
 * *credits_color* : couleur dans laquelle rendre les crédits de l'illustration
 
-Le fichier `./Computer_history_timeline - Contenus.csv` contient l'ensemble des cartes du jeu.
-La carte des règles est gérée séparément, elle est décrite en dur dans le dépôt (fichiers [./deck/0_rules_front.tex](./deck/0_rules_front.tex) et  [./deck/0_rules_back.tex](./deck/0_rules_back.tex)).
+Le fichier [`./content/computer_history_timeline.csv`](./content/computer_history_timeline.csv) contient l'ensemble des cartes du jeu.
+La carte des règles est gérée séparément, elle est décrite (en dur) dans le dépôt (fichiers [`./special_cards/0_rules_front.tex`](./special_cards/0_rules_front.tex) et  [`./special_cards/0_rules_back.tex`](./special_cards/0_rules_back.tex)).
+Des cartes "blanches", sur le modèle [`./special_cards/00_blank.tex`](./special_cards/00_blank.tex) sont aussi automatiquement ajoutée au jeu si celui-ci n'est pas un multiple de 9 cartes.
 
 Génération des cartes
 ------------------------
-
-**BUG NON RESOLU : ne pas utiliser -d -et -r en même temps, le faire séparement**
-
-Le script javascript [build.js](build.js) va parser le fichier csv de description pour :
+Le script javascript [`build.js`](build.js) va parser le fichier csv de description pour :
 
 * `-d` ou `--download` : télécharger les images dont les urls sont données dans le csv (champ `picture`)
 * `-r` ou `--resize` : recadrer des images (marche pour des images déjà téléchargées via `-r`)
@@ -64,24 +73,27 @@ Le script javascript [build.js](build.js) va parser le fichier csv de descriptio
 Exécuter `nodejs build.js --help` pour l'aide. Pour tout regénérer (c-à-d, télécharger les images, les recadrer, générer les .tex individuels, le jeu une face par page et le jeu 9 faces par page) les commandes sont les suivantes
 ```bash
 # download
-nodejs build.js -d  ./content/Computer_history_timeline\ -\ Contenus.csv            
+nodejs build.js -d  ./content/computer_history_timeline.csv            
 # resize des images
-nodejs build.js -r  ./content/Computer_history_timeline\ -\ Contenus.csv   
+nodejs build.js -r  ./content/computer_history_timeline.csv   
 # generation des cartes individuelles .tex
-nodejs build.js  -g -1 -9 ./content/Computer_history_timeline\ -\ Contenus.csv             
+nodejs build.js -g -1 -9 ./content/computer_history_timeline.csv             
 # génération des planches
-nodejs build.js  -1 -9 ./content/Computer_history_timeline\ -\ Contenus.csv             
+nodejs build.js -1 -9 ./content/computer_history_timeline.csv
+
+# les options sont combinables
+nodejs build.js -dg19r ./content/computer_history_timeline.csv
 ```
-Pour activer le mode debug, avec la bibliothèque [debug](https://www.npmjs.com/package/debug) il suffit de fixer la variable shell `DEBUG` 
+Pour activer le mode debug, avec la bibliothèque [debug](https://www.npmjs.com/package/debug) il suffit de fixer la variable shell `DEBUG`  comme ceci :
 ```bash
-DEBUG=timeline nodejs build.js ...
+DEBUG=timeline nodejs build.js [options] <fichiers>
 ```
 
 Ensuite, il faut compiler les fichiers .tex avec pdfLaTeX, voir le fichier [Makefile](./Makefile). Pour tout regénérer, taper simplement `make`, la cible par défaut générant les pdfs avec une face par page et celui avec 9 faces par page en utilisant [rubber](https://launchpad.net/rubber/). Pour générer à la main, utiliser `pdflatex nine_cards_by_page.tex` ou `pdflatex one_card_by_page.tex`.
 
-Le rendu final est accessible [sur mon site](http://liris.cnrs.fr/romuald.thion/files/Communication/Timeline/)
+[Le rendu final est accessible ici](http://liris.cnrs.fr/romuald.thion/files/Communication/Timeline/)
 
 Jeu de test
 --------------
 
-Le dossier [test_deck](test_deck) comprend quelques cartes de test, telles que générées à partir du csv. Elle servent à mettre au point ou modifier le fichier [./latex/tikzcards.tex](./latex/tikzcards.tex)
+Le dossier [test_deck](test_deck) comprend quelques cartes de test, telles que générées à partir du csv. Elle servent à mettre au point ou modifier le fichier [./latex/tikzcards.tex](./latex/tikzcards.tex).
