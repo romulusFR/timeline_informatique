@@ -1,8 +1,8 @@
 *.aux
 *.log
 node_modules/
-backup/
 img/*
+deck/*
 nine_cards_by_page.pdf
 nine_cards_by_page.tex
 one_card_by_page.pdf
