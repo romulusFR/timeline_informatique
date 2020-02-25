@@ -3,6 +3,8 @@ Projet de jeu de carte "Timeline Informatique"
 
 Réalisé pour la fête de la science 2017 au département informatique de l'Université Claude Bernard Lyon 1.
 
+[Le rendu final est accessible ici](http://liris.cnrs.fr/romuald.thion/files/Communication/Timeline/)
+
 Présentation
 ------------
 
@@ -108,8 +110,6 @@ DEBUG=timeline nodejs build.js [options] <fichiers>
 ```
 
 Ensuite, il faut compiler les fichiers .tex avec pdfLaTeX, voir le fichier [Makefile](./Makefile). Pour tout regénérer, taper simplement `make`, la cible par défaut générant les pdfs avec une face par page et celui avec 9 faces par page en utilisant [rubber](https://launchpad.net/rubber/). Pour générer à la main, utiliser `pdflatex nine_cards_by_page.tex` ou `pdflatex one_card_by_page.tex`.
-
-[Le rendu final est accessible ici](http://liris.cnrs.fr/romuald.thion/files/Communication/Timeline/)
 
 Jeu de test
 --------------
