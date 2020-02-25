@@ -80,7 +80,7 @@ function resizer(input, output) {
       // shift the cropped image on the "visible" part of the image (without the vertival strip)
       const strip_width = strip_width_percent * metadata.height / golden_ratio;
       const delta = Math.min(strip_width, target.left);
-      target.left = Math.round(target.left + delta);
+      target.left = Math.round(target.left - delta);
       target.flag = 'horizontal';
     }
     // otherwise, simply proportionnaly resize without cropping
