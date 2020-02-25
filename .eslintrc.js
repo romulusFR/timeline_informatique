@@ -15,7 +15,6 @@ module.exports = {
     "rules": {
       "camelcase" : "off",
       "no-restricted-syntax" : "off",
-      "no-alert" : "off",
       "no-console" : "off",
       "max-len": ['error', 120, 2, {
         ignoreUrls: true,

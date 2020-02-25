@@ -19,8 +19,7 @@ const fs = require('fs');
 const parse = require('csv-parse/lib/sync');
 const fetch = require('node-fetch');
 const path = require('path');
-const im_meta = require('im-metadata'); // TODO get rid of this lib
-const { exec } = require('child_process');
+const sharp = require('sharp');
 const program = require('commander');
 
 // eslint-disable-next-line object-curly-newline
@@ -49,43 +48,56 @@ const rules_front = `${special_path}0_rules_front.tex`; // special "rules" card,
 const rules_back = `${special_path}0_rules_back.tex`; // special "rules" card, back, added to the deck
 const blank_card = `${special_path}00_blank.tex`; // special blank card, added to pad A4 paper
 
-// system call to resize images using image magick's convert
-// see https://imagemagick.org/script/convert.php
-function convert(input, output, x, y, dx, dy) {
-  const cmd = `convert ${input} -quality 98 -crop "${x}x${y}+${dx}+${dy}" -resize "${golden_width}x${golden_height}" ${output}`;
-  debug(`Exec: ${cmd}`);
-  exec(cmd, (err) => {
-    if (err) {
-      throw new Error(`error while executing convert: ${err}`);
-    }
-  });
-}
-
 // resize images according to their format wrt the ideal one
 function resizer(input, output) {
-  im_meta(input, (error, metadata) => {
-    if (error) {
-      console.error(error);
+  // see doc https://sharp.pixelplumbing.com/
+  const image = sharp(input);
+  image.metadata((err, metadata) => {
+    if (err) {
+      return console.error(err);
     }
+    debug(`Image ${input} is ${metadata.width}x${metadata.height}`);
     const ratio = metadata.height / metadata.width;
+    const target = {
+      width: metadata.width,
+      height: metadata.height,
+      left: 0,
+      top: 0,
+      flag: 'normal',
+    };
 
     if (ratio > golden_ratio * (1 + ratio_threshold)) {
       // if the image is too much vertical
-      const new_height = Math.round(metadata.width * golden_ratio);
-      const new_y = Math.round((metadata.height - metadata.width * golden_ratio) / 2);
-      convert(input, output, metadata.width, new_height, 0, new_y);
-    } else if (ratio < golden_ratio * (1 - ratio_threshold)) {
-      const new_width = Math.round(metadata.height / golden_ratio);
-      const new_x = Math.round((metadata.width - (1 + strip_width_percent) * metadata.height / golden_ratio) / 2);
-      // if the image is too much horizontal. In that case, we have enough space to shift the cropped image on the "visible" part of the image
-      convert(input, output, new_width, metadata.height, new_x, 0);
-    } else {
-      // ratio is good
-      convert(input, output, metadata.width, metadata.height, 0, 0);
+      target.height = Math.round(metadata.width * golden_ratio);
+      target.top = Math.round((metadata.height - metadata.width * golden_ratio) / 2);
+      target.flag = 'vertical';
     }
+    if (ratio < golden_ratio * (1 - ratio_threshold)) {
+      // if the image is too much horizontal.
+      target.width = Math.round(metadata.height / golden_ratio);
+      target.left = ((metadata.width - metadata.height / golden_ratio) / 2);
+      // when the image is too much horizontal we have some room
+      // shift the cropped image on the "visible" part of the image (without the vertival strip)
+      const strip_width = strip_width_percent * metadata.height / golden_ratio;
+      const delta = Math.min(strip_width, target.left);
+      target.left = Math.round(target.left + delta);
+      target.flag = 'horizontal';
+    }
+    // otherwise, simply proportionnaly resize without cropping
+    debug(`Target resizing is ${JSON.stringify(target)}`);
+
+    return image
+      .extract(target)
+      .resize(golden_width, golden_height)
+      .toFile(output, (error, info) => {
+        if (error) {
+          console.error(`Sharp error : ${output} ${JSON.stringify(target)} from ${metadata.width}x${metadata.height} (${error})`);
+        } else {
+          debug(`Sharp : ${output} (${JSON.stringify(info.format)})`);
+        }
+      });
   });
 }
-
 // async download an image (or smtg else)
 // that function is quite "sensitive" to the uri
 // https://www.npmjs.com/package/node-fetch

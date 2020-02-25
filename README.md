@@ -10,7 +10,7 @@ Le jeu est généré en PDF en utilisant LaTeX à partir de la description des c
 Le processus de génération **est entièrement automatisé**, ce qui inclut :
 
   - le téléchargement des images (option `--download`);
-  - le renommage des images télécharges
+  - le renommage "de courtoisie" des images téléchargées;
   - le recentrage automatique (option `--resize`) des images;
   - la génération des fichiers LaTeX individuels (un verso, un recto) (option `--generate`);
   - la génération des planches LaTeX (soit 1 soit 9 carte par page) avec padding de cartes blanches si le nombre de cartes n'est pas multiple de 9 (options `--nine-by-page` et `--one-by-page`);
@@ -20,7 +20,6 @@ La génération de carte dans un autre format que les cartes poker (par défaut)
 ### Dépendances
 
 * Node.js et npm pour gérer les dépendances Node.js;
-* le recentrage automatique nécessite [ImageMagick](https://imagemagick.org/index.php);
 * la génération des `.pdf` finaux nécessite une chaine `pdflatex` avec TikZ;
 * éventuellement, `Makefile` et `rubber` pour la génération.
 
