@@ -5,6 +5,9 @@ Réalisé pour la fête de la science 2017 au département informatique de l'Uni
 
 [Le rendu final est accessible ici](http://liris.cnrs.fr/romuald.thion/files/Communication/Timeline/)
 
+TODO
+----
+
 Présentation
 ------------
 
