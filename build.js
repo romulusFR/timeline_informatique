@@ -1,5 +1,3 @@
-'use strict';
-
 /** *********************************************************************************************************
 Le présent projet est en licence Crative Commons BY-NC-SA 3.0, Romuald THION.
 
@@ -23,7 +21,13 @@ const sharp = require('sharp');
 const program = require('commander');
 
 // eslint-disable-next-line object-curly-newline
-const { name, version, homepage, description, main } = require('./package.json');
+const {
+  name,
+  version,
+  homepage,
+  description,
+  main,
+} = require('./package.json');
 
 // /!\ WARNING /!\ changes on size parameters below HAVE TO BE PROPAGATED TO ./latex/tikzcards.tex as well !
 
@@ -69,16 +73,19 @@ function resizer(input, output) {
     if (ratio > golden_ratio * (1 + ratio_threshold)) {
       // if the image is too much vertical
       target.height = Math.round(metadata.width * golden_ratio);
-      target.top = Math.round((metadata.height - metadata.width * golden_ratio) / 2);
+      target.top = Math.round(
+        (metadata.height - metadata.width * golden_ratio) / 2
+      );
       target.flag = 'vertical';
     }
     if (ratio < golden_ratio * (1 - ratio_threshold)) {
       // if the image is too much horizontal.
       target.width = Math.round(metadata.height / golden_ratio);
-      target.left = ((metadata.width - metadata.height / golden_ratio) / 2);
+      target.left = (metadata.width - metadata.height / golden_ratio) / 2;
       // when the image is too much horizontal we have some room
       // shift the cropped image on the "visible" part of the image (without the vertival strip)
-      const strip_width = strip_width_percent * metadata.height / golden_ratio;
+      const strip_width =
+        (strip_width_percent * metadata.height) / golden_ratio;
       const delta = Math.min(strip_width, target.left);
       target.left = Math.round(target.left - delta);
       target.flag = 'horizontal';
@@ -91,7 +98,11 @@ function resizer(input, output) {
       .resize(golden_width, golden_height)
       .toFile(output, (error, info) => {
         if (error) {
-          console.error(`Sharp error : ${output} ${JSON.stringify(target)} from ${metadata.width}x${metadata.height} (${error})`);
+          console.error(
+            `Sharp error : ${output} ${JSON.stringify(target)} from ${
+              metadata.width
+            }x${metadata.height} (${error})`
+          );
         } else {
           debug(`Sharp : ${output} (${JSON.stringify(info.format)})`);
         }
@@ -102,7 +113,8 @@ function resizer(input, output) {
 // that function is quite "sensitive" to the uri
 // https://www.npmjs.com/package/node-fetch
 function checkStatus(res) {
-  if (res.ok) { // res.status >= 200 && res.status < 300
+  if (res.ok) {
+    // res.status >= 200 && res.status < 300
     return res;
   }
   throw new Error(res.statusText);
@@ -136,16 +148,22 @@ function clean_french(string) {
 
 // helpers
 function pict_filename(card_obj, suffix = '') {
-  return `${img_path + card_obj.id}_${clean_french(card_obj.title)}${suffix}${path.extname(card_obj.picture)}`;
+  return `${img_path + card_obj.id}_${clean_french(
+    card_obj.title
+  )}${suffix}${path.extname(card_obj.picture)}`;
 }
 function card_type(str) {
   return `\\cardtype${str.charAt(0).toUpperCase()}${str.slice(1)}`;
 }
 function front_filename(card_obj) {
-  return `${output_path + card_obj.id}_${clean_french(card_obj.title)}_front.tex`;
+  return `${output_path + card_obj.id}_${clean_french(
+    card_obj.title
+  )}_front.tex`;
 }
 function back_filename(card_obj) {
-  return `${output_path + card_obj.id}_${clean_french(card_obj.title)}_back.tex`;
+  return `${output_path + card_obj.id}_${clean_french(
+    card_obj.title
+  )}_back.tex`;
 }
 
 function download_and_resize_picture(card_obj, resize = false) {
@@ -164,7 +182,9 @@ function download_and_resize_picture(card_obj, resize = false) {
 function front_content(card_obj) {
   debug(`front_content ${card_obj.title}`);
   // eslint-disable-next-line no-param-reassign
-  if (!card_obj.credits_color) { card_obj.credits_color = 'white'; }
+  if (!card_obj.credits_color) {
+    card_obj.credits_color = 'white';
+  }
 
   return `
   \\begin{tikzpicture}
@@ -259,18 +279,34 @@ function generate_latex_nine_cards_by_page(cards) {
     let str = '';
     if (idx < cards.length) {
       // standard card from the content file
-      if (front) { str = `      \\input{${front_filename(cards[idx])}}`; } else { str = `      \\input{${back_filename(cards[idx])}}`; }
+      if (front) {
+        str = `      \\input{${front_filename(cards[idx])}}`;
+      } else {
+        str = `      \\input{${back_filename(cards[idx])}}`;
+      }
     } else if (idx === cards.length) {
       // extra rule card appended at the end
-      if (front) { str = `      \\input{${rules_front}}`; } else { str = `      \\input{${rules_back}}`; }
+      if (front) {
+        str = `      \\input{${rules_front}}`;
+      } else {
+        str = `      \\input{${rules_back}}`;
+      }
     } else {
       // padding to fill the 3x3 tabular area
       str = `      \\input{${blank_card}}`;
     }
 
     if (front) {
-      if ((idx) % 3 === 2) { str += '\\\\%\r\n'; } else { str += '&%\r\n'; }
-    } else if ((idx) % 3 === 0) { str += '\\\\%\r\n'; } else { str += '&%\r\n'; }
+      if (idx % 3 === 2) {
+        str += '\\\\%\r\n';
+      } else {
+        str += '&%\r\n';
+      }
+    } else if (idx % 3 === 0) {
+      str += '\\\\%\r\n';
+    } else {
+      str += '&%\r\n';
+    }
     return str;
   }
 
@@ -293,7 +329,6 @@ function generate_latex_nine_cards_by_page(cards) {
     document += tabular_end;
   }
 
-
   fs.writeFileSync(latex_nine_cards_by_page_name, header + document + footer);
 }
 
@@ -301,34 +336,38 @@ function generate_latex_nine_cards_by_page(cards) {
 function timeline(cards) {
   debug(`Launching ${name} v${version}`);
   // MAIN PROGRAM LOOP : card generation
+  const options = program.opts();
+
   for (let i = 0; i < cards.length; i += 1) {
     const card_obj = cards[i];
-    if (program.download) {
+    if (options.download) {
       download_and_resize_picture(card_obj, program.resize);
     }
-    if (!program.download && program.resize) {
-      resizer(pict_filename(card_obj, '_web_original'), pict_filename(card_obj));
+    if (!options.download && options.resize) {
+      resizer(
+        pict_filename(card_obj, '_web_original'),
+        pict_filename(card_obj)
+      );
     }
-    if (program.generate) {
+    if (options.generate) {
       fs.writeFileSync(front_filename(card_obj), front_content(card_obj));
       fs.writeFileSync(back_filename(card_obj), back_content(card_obj));
     }
   }
 
-  if (program.nineByPage) {
+  if (options.nineByPage) {
     generate_latex_nine_cards_by_page(cards);
   }
 
-  if (program.oneByPage) {
+  if (options.oneByPage) {
     generate_latex_one_card_by_page(cards);
   }
 }
 
-
 // COMMAND LINE PROGRAM
 program
   .version(version)
-  .name(`nodejs ${main}`)
+  .name(`node ${main}`)
   .description(`${description}\nSee ${homepage} for further help.`)
   .usage('[options] <content_file>')
   .option('-d, --download', 'download the images')
@@ -338,7 +377,9 @@ program
   .option('-1, --one-by-page', 'generate main LaTeX file with one card by page')
   .parse(process.argv);
 
-if (program.args.length !== 1) { program.help(); }
+if (program.args.length !== 1) {
+  program.help();
+}
 
 // MAIN GLOBAL VARIABLES AND PROGRAM
 // synchronous read and parse
