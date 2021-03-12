@@ -28,17 +28,17 @@
   },
   "homepage": "https://github.com/romulusFR/timeline_informatique",
   "dependencies": {
-    "commander": "^5.0.0",
-    "csv-parse": "^4.8.8",
-    "debug": "^4.1.1",
-    "im-metadata": "^3.0.1",
-    "node-fetch": "^2.6.0",
-    "request": "^2.88.2",
-    "sharp": "^0.25.2"
+    "commander": "*",
+    "csv-parse": "*",
+    "debug": "*",
+    "im-metadata": "*",
+    "node-fetch": "*",
+    "request": "*",
+    "sharp": "*"
   },
   "devDependencies": {
-    "eslint": "^6.8.0",
-    "eslint-config-airbnb-base": "^14.1.0",
-    "eslint-plugin-import": "^2.20.2"
+    "eslint": "*",
+    "eslint-config-airbnb-base": "*",
+    "eslint-plugin-import": "*"
   }
 }
