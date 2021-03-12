@@ -1,3 +1,5 @@
+'use strict';
+
 /** *********************************************************************************************************
 Le présent projet est en licence Crative Commons BY-NC-SA 3.0, Romuald THION.
 
@@ -74,7 +76,7 @@ function resizer(input, output) {
       // if the image is too much vertical
       target.height = Math.round(metadata.width * golden_ratio);
       target.top = Math.round(
-        (metadata.height - metadata.width * golden_ratio) / 2
+        (metadata.height - metadata.width * golden_ratio) / 2,
       );
       target.flag = 'vertical';
     }
@@ -84,8 +86,7 @@ function resizer(input, output) {
       target.left = (metadata.width - metadata.height / golden_ratio) / 2;
       // when the image is too much horizontal we have some room
       // shift the cropped image on the "visible" part of the image (without the vertival strip)
-      const strip_width =
-        (strip_width_percent * metadata.height) / golden_ratio;
+      const strip_width = (strip_width_percent * metadata.height) / golden_ratio;
       const delta = Math.min(strip_width, target.left);
       target.left = Math.round(target.left - delta);
       target.flag = 'horizontal';
@@ -101,7 +102,7 @@ function resizer(input, output) {
           console.error(
             `Sharp error : ${output} ${JSON.stringify(target)} from ${
               metadata.width
-            }x${metadata.height} (${error})`
+            }x${metadata.height} (${error})`,
           );
         } else {
           debug(`Sharp : ${output} (${JSON.stringify(info.format)})`);
@@ -125,12 +126,13 @@ function download(uri, filename, callback) {
   //  <client name>/<version> (<contact information>) <library/framework name>/<version> [<library name>/<version> ...].
   const agent = `${name}/${version} (${homepage}) node-fetch/2.6`;
   const opts = { headers: { 'User-Agent': agent } };
-  debug(`Downloading (${uri}, ${filename}, ...)`);
+  debug(`Downloading ${uri})`);
   fetch(uri, opts)
     .then(checkStatus)
     .then((res) => {
       const dest = fs.createWriteStream(filename);
       res.body.pipe(dest);
+      dest.on('finish', () => debug(`...${uri} downloaded to ${filename}`));
       dest.on('finish', callback);
     })
     .catch(console.err);
@@ -149,7 +151,7 @@ function clean_french(string) {
 // helpers
 function pict_filename(card_obj, suffix = '') {
   return `${img_path + card_obj.id}_${clean_french(
-    card_obj.title
+    card_obj.title,
   )}${suffix}${path.extname(card_obj.picture)}`;
 }
 function card_type(str) {
@@ -157,12 +159,12 @@ function card_type(str) {
 }
 function front_filename(card_obj) {
   return `${output_path + card_obj.id}_${clean_french(
-    card_obj.title
+    card_obj.title,
   )}_front.tex`;
 }
 function back_filename(card_obj) {
   return `${output_path + card_obj.id}_${clean_french(
-    card_obj.title
+    card_obj.title,
   )}_back.tex`;
 }
 
@@ -346,7 +348,7 @@ function timeline(cards) {
     if (!options.download && options.resize) {
       resizer(
         pict_filename(card_obj, '_web_original'),
-        pict_filename(card_obj)
+        pict_filename(card_obj),
       );
     }
     if (options.generate) {

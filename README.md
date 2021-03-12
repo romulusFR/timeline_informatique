@@ -117,6 +117,8 @@ DEBUG=timeline node build.js [options] <fichiers>
 
 Ensuite, il faut compiler les fichiers .tex avec pdfLaTeX, voir le fichier [Makefile](./Makefile). Pour tout regénérer, taper simplement `make`, la cible par défaut générant les pdfs avec une face par page et celui avec 9 faces par page en utilisant [rubber](https://launchpad.net/rubber/). Pour générer à la main, utiliser `pdflatex nine_cards_by_page.tex` ou `pdflatex one_card_by_page.tex`.
 
+**Attention** il faut une installation TeXLive assez complète, avec nottamment le paquet anttor (dans `texlive-fonts-extra` sous Ubuntu)
+
 Jeu de test
 --------------
 
