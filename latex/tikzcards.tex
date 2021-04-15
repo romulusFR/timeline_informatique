@@ -44,7 +44,7 @@
 \pgfmathsetmacro{\textpadding}{0.0167*\cardwidth}%{0.1} %0.0167
 %% padding for text
 
-\pgfmathsetmacro{\ratiocontent}{0.66}
+\pgfmathsetmacro{\ratiocontent}{0.7}
 %% % of vertical space used for content
 
 \def\shapeCard{(0,0) rectangle (\cardwidth,\cardheight)}
@@ -61,7 +61,8 @@
 %% backgound zone for title
 
 %% title (front)/date (back) : upper left to  lower right
-\def\shapeContentArea{(2*\strippadding+\stripwidth+\borderwidth,\cardheight) rectangle (\cardwidth,\cardheight-\borderwidth-\ratiocontent*\cardheight)}
+\def\shapeContentArea{(2*\strippadding+\stripwidth+\borderwidth,\cardheight) rectangle (\cardwidth,\borderwidth + 1*\strippadding)}
+%% \cardheight-\borderwidth-\ratiocontent*\cardheight
 %% main text (back of the card), relative to cardheight and cardwidth to "cut" top and right rounded corners
 
 \def\shapeStrip{(\strippadding+\borderwidth,\cardheight) rectangle (\strippadding+\stripwidth+\borderwidth,\strippadding+\borderwidth)}
@@ -111,8 +112,12 @@
 }
 %% main card, with border
 
-\newcommand{\cardbackground}[1]{
+\newcommand{\cardfrontbackground}[1]{
   \draw[lightgray,cardimage=#1] \shapeBackground;
+}
+%% main zone, where the image is printed
+\newcommand{\cardbackbackground}[1]{
+  \draw[lightgray,cardimage=#1, fill opacity=0.2] \shapeBackground;
 }
 %% main zone, where the image is printed
 
@@ -142,7 +147,7 @@
 \newcommand{\cardcontent}[2]{
   \begin{scope}[even odd rule]
     \clip \shapeBackground;
-    \fill[elementcorners,contentbg,opacity=.85] \shapeContentArea;
+    \fill[elementcorners,contentbg,opacity=.5] \shapeContentArea;
   \end{scope}
   \node[below right, align=justify, text width=(\imagewidth-2*\strippadding-\stripwidth-2*\textpadding)*1cm] at (\borderwidth+2*\strippadding+\stripwidth+0*\textpadding,\cardheight-\textpadding-\borderwidth) {
     \centerline{\bf\Large #1}\\%

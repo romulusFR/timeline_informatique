@@ -173,8 +173,8 @@ function download_and_resize_picture(card_obj, resize = false) {
   // resizer(pict_filename(card_obj, '_web_original'), pict_filename(card_obj));
   const filename = pict_filename(card_obj, '_web_original');
   download(card_obj.picture, filename, () => {
+    debug(`...Downloaded (${filename})`);
     if (resize) {
-      debug(`...Downloaded (${filename})`);
       resizer(filename, pict_filename(card_obj));
     }
   });
@@ -191,7 +191,7 @@ function front_content(card_obj) {
   return `
   \\begin{tikzpicture}
     \\cardborder
-    \\cardbackground{${pict_filename(card_obj)}}
+    \\cardfrontbackground{${pict_filename(card_obj)}}
     ${card_type(card_obj.type)}
     \\cardtitle{${card_obj.title}}
     \\cardcredits[${card_obj.credits_color}]{${card_obj.credits}}
@@ -204,9 +204,8 @@ function back_content(card_obj) {
   return `
   \\begin{tikzpicture}
     \\cardborder
-    \\cardbackground{${pict_filename(card_obj)}}
+    \\cardbackbackground{${pict_filename(card_obj)}}
     ${card_type(card_obj.type)}
-    \\cardtitle{${card_obj.title}}
     \\cardcontent{${card_obj.year}}{${card_obj.description}}
   \\end{tikzpicture}`;
 }
@@ -343,7 +342,7 @@ function timeline(cards) {
   for (let i = 0; i < cards.length; i += 1) {
     const card_obj = cards[i];
     if (options.download) {
-      download_and_resize_picture(card_obj, program.resize);
+      download_and_resize_picture(card_obj, options.resize);
     }
     if (!options.download && options.resize) {
       resizer(
