@@ -118,7 +118,7 @@ function checkStatus(res) {
     // res.status >= 200 && res.status < 300
     return res;
   }
-  throw new Error(res.statusText);
+  throw new Error(`${res.statusText} from ${res.url}`);
 }
 
 function download(uri, filename, callback) {
